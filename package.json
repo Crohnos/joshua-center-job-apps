@@ -1,0 +1,20 @@
+{
+  "name": "job-app-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:server": "cd server && npm run start",
+    "dev:server": "cd server && npm run dev",
+    "start:client": "cd src && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run start:client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
