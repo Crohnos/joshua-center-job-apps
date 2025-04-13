@@ -2,8 +2,9 @@ import axios from 'axios';
 
 // Create axios instance with defaults
 const api = axios.create({
-  // Use the VITE_API_URL environment variable or fall back to localhost for development
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+  // When using the proxy, we don't need to specify the baseURL
+  // The API requests will be proxied through the same domain
+  baseURL: '', // Empty string means use the current domain
   withCredentials: true, // This is crucial for cookies to be sent
   headers: {
     'Content-Type': 'application/json'

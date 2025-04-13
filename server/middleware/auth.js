@@ -222,7 +222,8 @@ const sessionMiddleware = () => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Only use 'none' in production
       httpOnly: true,
-      domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined // Share cookie across subdomains
+      // Remove domain setting to let the browser use the current domain
+      // This works better with the proxy approach
     }
   };
   

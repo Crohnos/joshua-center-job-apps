@@ -88,6 +88,7 @@ router.get('/google/callback',
       ? (req.session.redirectTo || '/admin/applicants')
       : `/#${req.session.redirectTo || '/admin/applicants'}`;
       
+    // When using proxy, we can redirect using relative URLs
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
     console.log(`Admin auth. Redirecting to: ${redirectUrl}`);
     console.log('=== END CALLBACK DEBUG - After Authentication ===');
