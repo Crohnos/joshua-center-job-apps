@@ -142,15 +142,32 @@ function getApplicants(req, res) {
     ORDER BY a.id DESC
   `;
   
+  console.log('Executing SQL query:', query);
+  
   db.all(query, (err, rows) => {
     if (err) {
       console.error('Error fetching applicants:', err);
-      return res.status(500).send(`Error fetching applicants: ${err.message}`);
+      return res.status(500).json({ error: `Error fetching applicants: ${err.message}` });
     }
     
-    console.log(`Returning ${rows.length} applicants`);
+    console.log(`Found ${rows.length} applicants in database:`, rows);
+    
+    // Check for null values that might cause issues
+    const sanitizedRows = rows.map(row => {
+      // Replace any null values with appropriate defaults
+      return {
+        id: row.id,
+        email: row.email || '',
+        name: row.name || '',
+        application_status: row.application_status || 'not viewed',
+        assigned_employee_id: row.assigned_employee_id || null,
+        assigned_to: row.assigned_to || null
+      };
+    });
+    
+    console.log('Sending sanitized applicant data:', sanitizedRows);
     res.setHeader('Cache-Control', 'no-store');
-    res.json(rows);
+    res.json(sanitizedRows);
   });
 }
 

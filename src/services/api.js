@@ -69,12 +69,23 @@ export const checkEmailExists = async (email) => {
 export const getApplicants = async () => {
   try {
     console.log('Fetching applicants...');
+    console.log('API config:', {
+      baseURL: api.defaults.baseURL,
+      withCredentials: api.defaults.withCredentials,
+      headers: api.defaults.headers
+    });
+    
     // Use the default api instance which already has withCredentials set
     const response = await api.get('/api/applicants');
-    console.log('Applicants response:', response.data);
+    console.log('Applicants response status:', response.status);
+    console.log('Applicants response headers:', response.headers);
+    console.log('Applicants response data:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching applicants:', error.response?.data || error.message);
+    console.error('Error fetching applicants:', error);
+    console.error('Response data:', error.response?.data);
+    console.error('Response status:', error.response?.status);
+    console.error('Response headers:', error.response?.headers);
     return [];
   }
 };
