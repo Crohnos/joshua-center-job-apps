@@ -9,14 +9,31 @@ function ApplicantList() {
   const [userFilter, setUserFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Fetch applicants and users
-  const { data: applicants = [], isLoading, refetch } = useQuery({
+  // Fetch applicants and users with error handling
+  const { 
+    data: applicants = [], 
+    isLoading, 
+    isError,
+    error,
+    refetch 
+  } = useQuery({
     queryKey: ['applicants'],
-    queryFn: getApplicants
+    queryFn: getApplicants,
+    staleTime: 10000,
+    retry: 3,
+    onError: (err) => console.error("Failed to fetch applicants:", err)
   });
-  const { data: users = [] } = useQuery({
+  
+  const { 
+    data: users = [],
+    isError: usersError,
+    error: usersErrorDetails 
+  } = useQuery({
     queryKey: ['users'],
-    queryFn: getUsers
+    queryFn: getUsers,
+    staleTime: 10000,
+    retry: 3,
+    onError: (err) => console.error("Failed to fetch users:", err)
   });
   
   // Handle status change
@@ -199,6 +216,31 @@ function ApplicantList() {
         {isLoading ? (
           <div className="data-table-wrapper custom-width" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
             <div aria-busy="true">Loading applications...</div>
+          </div>
+        ) : isError ? (
+          <div className="data-table-wrapper custom-width" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+            <div className="alert error">
+              <div className="alert-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <div className="alert-content">
+                <div className="alert-title">Error Loading Data</div>
+                <p>
+                  {error?.message || "Failed to load applications. Please refresh to try again."}
+                  <button 
+                    onClick={() => refetch()} 
+                    style={{marginLeft: '10px'}}
+                    className="button primary small"
+                  >
+                    Retry
+                  </button>
+                </p>
+              </div>
+            </div>
           </div>
         ) : filteredApplicants.length === 0 ? (
           <div className="data-table-wrapper custom-width" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>

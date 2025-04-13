@@ -67,8 +67,21 @@ export const checkEmailExists = async (email) => {
 };
 
 export const getApplicants = async () => {
-  const response = await api.get('/api/applicants');
-  return response.data;
+  try {
+    console.log('Fetching applicants...');
+    const response = await api.get('/api/applicants', {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    console.log('Applicants response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching applicants:', error.response?.data || error.message);
+    return [];
+  }
 };
 
 export const getApplicant = async (id) => {
@@ -82,8 +95,21 @@ export const updateApplicant = async (id, data) => {
 };
 
 export const getUsers = async () => {
-  const response = await api.get('/api/users');
-  return response.data;
+  try {
+    console.log('Fetching users...');
+    const response = await api.get('/api/users', {
+      withCredentials: true, 
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    console.log('Users response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching users:', error.response?.data || error.message);
+    return [];
+  }
 };
 
 export const addUser = async (data) => {
