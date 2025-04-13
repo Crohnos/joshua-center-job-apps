@@ -6,20 +6,29 @@ const db = require('./models/db');
 const fs = require('fs').promises;
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
 const { passport, session } = require('./middleware/auth');
 
 const app = express();
 
+// Trust proxy - needed for secure cookies behind a proxy/load balancer
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(express.json());
-app.use(cors({
+
+// Set up CORS with appropriate settings for cross-domain cookies
+const corsOptions = {
   // Allow multiple origins (both production and development)
   origin: function(origin, callback) {
     const allowedOrigins = [
       process.env.CLIENT_URL || 'http://localhost:5173', 
-      'https://joshua-center-job-apps-app.onrender.com'
+      'https://joshua-center-job-apps-app.onrender.com',
+      // Local development 
+      'http://localhost:3000',
+      'http://127.0.0.1:5173'
     ];
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -31,8 +40,16 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+};
+
+console.log('Setting up CORS with options:', {
+  ...corsOptions,
+  origin: 'Function configured with allowed origins'
+});
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());

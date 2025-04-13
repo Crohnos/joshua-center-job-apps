@@ -215,11 +215,14 @@ const sessionMiddleware = () => {
     store: new SQLiteStore(sqliteStoreOptions),
     secret: sessionSecret,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Changed to true to ensure session is always stored
+    proxy: true, // Trust the reverse proxy
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-      sameSite: 'none' // For cross-domain cookies
+      secure: process.env.NODE_ENV === 'production', // Only use secure in production
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Only use 'none' in production
+      httpOnly: true,
+      domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined // Share cookie across subdomains
     }
   };
   

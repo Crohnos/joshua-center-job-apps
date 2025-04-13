@@ -50,7 +50,8 @@ router.get('/google/callback',
   },
   passport.authenticate('google', { 
     failureRedirect: '/',
-    failureMessage: true 
+    failureMessage: true,
+    session: true // Explicitly enable session
   }), 
   (req, res) => {
     console.log('=== CALLBACK DEBUG - After Authentication ===');
@@ -104,8 +105,13 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/check-auth', (req, res) => {
-  console.log('Check auth hit, isAuthenticated:', req.isAuthenticated());
+  console.log('=== CHECK AUTH DEBUG ===');
+  console.log('Check auth hit, session ID:', req.sessionID);
+  console.log('isAuthenticated:', req.isAuthenticated());
+  console.log('Session data:', req.session);
+  console.log('Session cookie:', req.cookies);
   console.log('User:', req.user);
+  console.log('=== END CHECK AUTH DEBUG ===');
   
   if (req.isAuthenticated()) {
     return res.status(200).json({ authenticated: true, user: req.user });

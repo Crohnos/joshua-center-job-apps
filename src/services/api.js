@@ -4,7 +4,10 @@ import axios from 'axios';
 const api = axios.create({
   // Use the VITE_API_URL environment variable or fall back to localhost for development
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
-  withCredentials: true,
+  withCredentials: true, // This is crucial for cookies to be sent
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 // API service functions
