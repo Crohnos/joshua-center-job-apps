@@ -45,7 +45,7 @@ const passportSetup = () => {
     passport.use(new GoogleStrategy({
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/callback', // Use relative URL for proxy compatibility
+      callbackURL: `${process.env.SERVER_URL || 'http://localhost:3001'}/auth/google/callback`,
       proxy: true
     }, (accessToken, refreshToken, profile, done) => {
       try {
@@ -222,9 +222,7 @@ const sessionMiddleware = () => {
       secure: process.env.NODE_ENV === 'production', // Only use secure in production
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Only use 'none' in production
-      httpOnly: true,
-      // Remove domain setting to let the browser use the current domain
-      // This works better with the proxy approach
+      httpOnly: true
     }
   };
   
