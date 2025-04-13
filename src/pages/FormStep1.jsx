@@ -217,6 +217,10 @@ function FormStep1() {
                   Return to Homepage
                 </a>
               </div>
+              
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                <a href="/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
+              </div>
             </div>
           </div>
         ) : step === 'email' ? (
@@ -288,6 +292,10 @@ function FormStep1() {
                   <div className="alert-title">Contact Information</div>
                   <p>If you have questions about the application process, please contact: <strong>Chad Imhoff</strong> - Email: <a href="mailto:chad@thejoshuacenter.com">chad@thejoshuacenter.com</a></p>
                 </div>
+              </div>
+              
+              <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                <a href="/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
               </div>
             </div>
           </div>
