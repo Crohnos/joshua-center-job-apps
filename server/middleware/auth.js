@@ -1,5 +1,8 @@
 const passport = require('passport');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
+const path = require('path');
+const fs = require('fs');
 const db = require('../models/db');
 
 // Setup passport and session
@@ -186,24 +189,43 @@ function isAdmin(req, res, next) {
 // Initialize passport
 passportSetup();
 
-// Create session middleware with detailed logging
+// Create session middleware with persistent SQLite storage
 const sessionMiddleware = () => {
   console.log('=== SESSION CONFIG DEBUG ===');
   const sessionSecret = process.env.SESSION_SECRET || 'default-dev-secret';
   console.log('Session secret:', sessionSecret ? `${sessionSecret.substring(0, 3)}...` : 'Not set');
   
+  // Ensure sessions directory exists
+  const dataDir = path.join(__dirname, '../data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  
+  // Create a SQLite session store
+  const sessionDBPath = path.join(dataDir, 'sessions.db');
+  console.log(`Using session database at: ${sessionDBPath}`);
+  
+  const sqliteStoreOptions = {
+    db: 'sessions.db',
+    dir: dataDir,
+    table: 'sessions'
+  };
+  
   const sessionConfig = {
+    store: new SQLiteStore(sqliteStoreOptions),
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000 // 1 day
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'none' // For cross-domain cookies
     }
   };
   
   console.log('Session config:', {
     ...sessionConfig,
+    store: 'SQLiteStore',
     secret: sessionConfig.secret ? `${sessionConfig.secret.substring(0, 3)}...` : 'Not set'
   });
   console.log('=== END SESSION CONFIG DEBUG ===');
