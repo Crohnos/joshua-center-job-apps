@@ -28,7 +28,7 @@ function App() {
       <Router>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Navigate to="/form/step1" replace />} />
+          <Route path="/" element={<Navigate to="/admin/applicants" replace />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
           
           {/* Form steps */}
