@@ -52,6 +52,8 @@ const corsOptions = {
       process.env.CLIENT_URL || 'http://localhost:5173', 
       'https://joshua-center-job-apps-app.onrender.com',
       'https://www.joshua-center-job-apps-app.onrender.com',
+      'https://joshua-center-job-apps.onrender.com',
+      'https://www.joshua-center-job-apps.onrender.com',
       // Local development 
       'http://localhost:3000',
       'http://127.0.0.1:5173'
@@ -95,6 +97,16 @@ app.use('/api', apiRoutes);
 const uploadsDir = path.join(__dirname, '../uploads');
 app.use('/uploads', express.static(uploadsDir));
 
+// Simple health check route
+app.get('/health', (req, res) => {
+  res.status(200).send('Server is healthy');
+});
+
+// Root route for API server check
+app.get('/api-status', (req, res) => {
+  res.send('Job Application API Server Running');
+});
+
 // In production, serve static files from the built frontend
 if (IS_PRODUCTION) {
   // Check if the build directory exists
@@ -107,11 +119,30 @@ if (IS_PRODUCTION) {
       // Serve static files from the React build
       app.use(express.static(frontendBuildPath));
       
-      // For any route not handled by API, serve the React app
-      app.get('*', (req, res) => {
-        // Exclude API routes to avoid conflict
-        if (!req.path.startsWith('/api') && !req.path.startsWith('/auth') && !req.path.startsWith('/uploads')) {
+      // Create a specific "catch-all" route for SPA that should come AFTER API routes
+      // but BEFORE the 404 handler
+      app.get('/', (req, res) => {
+        // Send the main index.html for root requests
+        res.sendFile(path.join(frontendBuildPath, 'index.html'));
+      });
+      
+      // Serve the React app for any routes that aren't API/auth/uploads
+      app.use((req, res, next) => {
+        // Skip API and other special routes
+        if (req.path.startsWith('/api') || 
+            req.path.startsWith('/auth') || 
+            req.path.startsWith('/uploads') || 
+            req.path.startsWith('/health') ||
+            req.path.startsWith('/api-status')) {
+          return next();
+        }
+        
+        // For all other routes, serve the React app
+        try {
           res.sendFile(path.join(frontendBuildPath, 'index.html'));
+        } catch (err) {
+          console.error(`Error serving React app for path ${req.path}:`, err);
+          next(err);
         }
       });
     } else {
@@ -122,14 +153,13 @@ if (IS_PRODUCTION) {
   }
 }
 
-// Simple health check route
-app.get('/health', (req, res) => {
-  res.status(200).send('Server is healthy');
-});
-
-// Root route for API
-app.get('/', (req, res) => {
-  res.send('Job Application API Server Running');
+// API information route
+app.get('/api-info', (req, res) => {
+  res.json({
+    name: 'Job Application API',
+    version: '1.0.0',
+    status: 'running'
+  });
 });
 
 // Database initialization
@@ -183,9 +213,21 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
+  // Get the public URL if on Render.com
+  const host = process.env.RENDER_EXTERNAL_URL || 
+               process.env.SERVER_URL || 
+               `http://localhost:${PORT}`;
+  
+  // If SERVER_URL isn't set but we're on Render, use the Render URL
+  if (IS_PRODUCTION && !process.env.SERVER_URL && process.env.RENDER_EXTERNAL_URL) {
+    process.env.SERVER_URL = process.env.RENDER_EXTERNAL_URL;
+    process.env.CLIENT_URL = process.env.RENDER_EXTERNAL_URL;
+  }
+  
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${IS_PRODUCTION ? 'production' : 'development'}`);
+  console.log(`Host URL: ${host}`);
   console.log(`Server URL: ${process.env.SERVER_URL || `http://localhost:${PORT}`}`);
   console.log(`Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
 });
