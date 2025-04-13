@@ -3,19 +3,14 @@ require('dotenv').config();
 
 // Set critical environment variables early
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-console.log('[PRODUCTION DEBUG] Server starting up...');
-console.log('[PRODUCTION DEBUG] Environment:', IS_PRODUCTION ? 'production' : 'development');
-console.log('[PRODUCTION DEBUG] Render URL:', process.env.RENDER_EXTERNAL_URL);
-console.log('[PRODUCTION DEBUG] Initial SERVER_URL:', process.env.SERVER_URL);
-console.log('[PRODUCTION DEBUG] Initial CLIENT_URL:', process.env.CLIENT_URL);
+console.log('Server starting up...');
+console.log('Environment:', IS_PRODUCTION ? 'production' : 'development');
 
 if (IS_PRODUCTION && process.env.RENDER_EXTERNAL_URL) {
   // When running on Render.com, use the provided external URL
   process.env.SERVER_URL = process.env.RENDER_EXTERNAL_URL;
   process.env.CLIENT_URL = process.env.RENDER_EXTERNAL_URL;
-  console.log(`[PRODUCTION DEBUG] Setting URLs from Render: ${process.env.RENDER_EXTERNAL_URL}`);
-  console.log('[PRODUCTION DEBUG] Updated SERVER_URL:', process.env.SERVER_URL);
-  console.log('[PRODUCTION DEBUG] Updated CLIENT_URL:', process.env.CLIENT_URL);
+  console.log(`Setting URLs from Render: ${process.env.RENDER_EXTERNAL_URL}`);
 }
 
 const express = require('express');
@@ -181,65 +176,32 @@ app.get('/api-info', (req, res) => {
 // Database initialization
 async function initializeDatabase() {
   try {
-    console.log('[PRODUCTION DEBUG] Initializing database...');
-    
-    const dbPath = path.join(__dirname, 'data/joshua_center.db');
-    console.log('[PRODUCTION DEBUG] Database path:', dbPath);
-    console.log('[PRODUCTION DEBUG] Database exists:', fsSync.existsSync(dbPath));
-    
-    if (fsSync.existsSync(dbPath)) {
-      const stats = fsSync.statSync(dbPath);
-      console.log('[PRODUCTION DEBUG] Database file size:', stats.size, 'bytes');
-      console.log('[PRODUCTION DEBUG] Database last modified:', stats.mtime);
-    }
+    console.log('Initializing database...');
     
     // Read and execute the SQL schema
     const sql = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
-    console.log('[PRODUCTION DEBUG] SQL file read, length:', sql.length);
     
     db.exec(sql, (err) => {
       if (err) {
-        console.error('[PRODUCTION DEBUG] Database initialization error:', err);
+        console.error('Database initialization error:', err);
       } else {
-        console.log('[PRODUCTION DEBUG] Database initialized successfully');
+        console.log('Database initialized successfully');
         
-        // Check applicant count in all environments for debugging
+        // Check applicant count
         db.get('SELECT COUNT(*) as count FROM Applicant', (err, result) => {
           if (err) {
-            console.error('[PRODUCTION DEBUG] Error checking applicant count:', err);
+            console.error('Error checking applicant count:', err);
             return;
           }
           
-          console.log(`[PRODUCTION DEBUG] Database contains ${result.count} applicants`);
+          console.log(`Database contains ${result.count} applicants`);
           
-          // For debugging in production too, print the first few applicants
-          db.all('SELECT id, name, email FROM Applicant LIMIT 3', (err, rows) => {
-            if (err) {
-              console.error('[PRODUCTION DEBUG] Error fetching sample applicants:', err);
-              return;
-            }
-            
-            console.log('[PRODUCTION DEBUG] Sample applicants:', rows);
-          });
-          
-          // If there are no applicants, generate mock data
-          if (result.count === 0) {
-            console.log('[PRODUCTION DEBUG] No applicants found in database, generating mock data...');
-            
-            // Import and run the mock data generator 
-            // We'll now do this in any environment if the DB is empty
-            try {
-              console.log('[PRODUCTION DEBUG] Running mock data generator...');
-              require('./models/mock_data');
-            } catch (err) {
-              console.error('[PRODUCTION DEBUG] Error generating mock data:', err);
-            }
-          } 
+          // No automated mock data generation - must run populate_db.js script manually
         });
       }
     });
   } catch (err) {
-    console.error('[PRODUCTION DEBUG] Failed to read SQL file:', err);
+    console.error('Failed to read SQL file:', err);
   }
 }
 
