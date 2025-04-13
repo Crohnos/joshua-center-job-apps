@@ -1,13 +1,23 @@
 import axios from 'axios';
 
+// Log API URL to help with debugging
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+console.log('API URL:', apiUrl);
+
 // Create axios instance with defaults
 const api = axios.create({
   // Use absolute URLs for production
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
+  baseURL: apiUrl,
   withCredentials: true, // This is crucial for cookies to be sent
   headers: {
     'Content-Type': 'application/json'
   }
+});
+
+// Add an interceptor to include credentials with every request
+api.interceptors.request.use(config => {
+  config.withCredentials = true;
+  return config;
 });
 
 // API service functions
