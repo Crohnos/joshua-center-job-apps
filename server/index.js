@@ -132,6 +132,17 @@ app.get('/api-info', (req, res) => {
   });
 });
 
+// Sample PDF generation
+async function generateSamplePDFs() {
+  try {
+    // Import the PDF generator module
+    const generatePDFs = require('./generate-sample-pdfs');
+    generatePDFs(); // Call the function to generate PDFs
+  } catch (err) {
+    console.error('Error generating sample PDFs:', err);
+  }
+}
+
 // Database initialization
 async function initializeDatabase() {
   try {
@@ -175,6 +186,9 @@ async function initializeDatabase() {
                       console.error('Error adding additional sample data:', err);
                     } else {
                       console.log('Additional sample data added successfully');
+                      
+                      // Generate sample PDFs for the resumes after data is added
+                      generateSamplePDFs();
                     }
                   });
                 } catch (err) {
@@ -187,6 +201,9 @@ async function initializeDatabase() {
           }
         } else {
           console.log(`Database already contains ${result.count} applicants`);
+          
+          // Even if the database already has data, make sure PDFs exist
+          generateSamplePDFs();
         }
       });
     });

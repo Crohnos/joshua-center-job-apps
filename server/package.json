@@ -7,6 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "seed": "node -e \"const db=require('./models/db');const fs=require('fs');const path=require('path');fs.readFile(path.join(__dirname,'models/essential_data.sql'),'utf8',(err,data)=>db.exec(data,(err)=>console.log(err||'Sample data added')))\"",
+    "seed-pdfs": "node generate-sample-pdfs.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
