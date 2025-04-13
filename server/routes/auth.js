@@ -66,7 +66,7 @@ router.get('/google/callback',
     // If authentication failed with a message, redirect to login with error
     if (req.session.messages && req.session.messages.length) {
       const errorMsg = encodeURIComponent(req.session.messages[req.session.messages.length-1]);
-      const errorUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=${errorMsg}`;
+      const errorUrl = `/#/?error=${errorMsg}`;
       console.log(`Auth failed with message. Redirecting to: ${errorUrl}`);
       return res.redirect(errorUrl);
     }
@@ -78,7 +78,7 @@ router.get('/google/callback',
         ? req.session.redirectTo 
         : `/#${req.session.redirectTo}`;
       
-      const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}?email=${encodeURIComponent(req.user.email)}`;
+      const redirectUrl = `${redirectPath}?email=${encodeURIComponent(req.user.email)}`;
       console.log(`Form auth. Redirecting to: ${redirectUrl}`);
       return res.redirect(redirectUrl);
     }
@@ -88,8 +88,8 @@ router.get('/google/callback',
       ? (req.session.redirectTo || '/admin/applicants')
       : `/#${req.session.redirectTo || '/admin/applicants'}`;
       
-    // When using proxy, we can redirect using relative URLs
-    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
+    // Use relative URL for redirection with proxy
+    const redirectUrl = `${redirectPath}`;
     console.log(`Admin auth. Redirecting to: ${redirectUrl}`);
     console.log('=== END CALLBACK DEBUG - After Authentication ===');
     
@@ -100,8 +100,8 @@ router.get('/google/callback',
 router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).send('Error logging out');
-    // Redirect to the client login page instead of server root - use hash format
-    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/#/`);
+    // Redirect to the client login page with relative URL for proxy
+    res.redirect('/#/');
   });
 });
 

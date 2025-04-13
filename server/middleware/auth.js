@@ -45,7 +45,8 @@ const passportSetup = () => {
     passport.use(new GoogleStrategy({
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.SERVER_URL || 'http://localhost:3001'}/auth/google/callback`
+      callbackURL: '/auth/google/callback', // Use relative URL for proxy compatibility
+      proxy: true
     }, (accessToken, refreshToken, profile, done) => {
       try {
         console.log('Google OAuth callback received');
