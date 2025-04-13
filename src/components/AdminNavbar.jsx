@@ -7,8 +7,9 @@ function AdminNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const handleLogout = () => {
-    // Redirect to the server's logout endpoint
-    window.location.href = 'http://localhost:3001/auth/logout';
+    // Redirect to the server's logout endpoint using environment variable
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    window.location.href = `${apiUrl}/auth/logout`;
   };
 
   const toggleMobileMenu = () => {
