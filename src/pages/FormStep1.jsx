@@ -219,7 +219,7 @@ function FormStep1() {
               </div>
               
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <a href="/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
+                <a href="/#/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
               </div>
             </div>
           </div>
@@ -295,7 +295,7 @@ function FormStep1() {
               </div>
               
               <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                <a href="/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
+                <a href="/#/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
               </div>
             </div>
           </div>

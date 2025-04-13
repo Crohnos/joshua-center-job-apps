@@ -31,8 +31,11 @@ function LoginPage() {
   
   // Redirect to auth with return URL as query parameter
   const handleLogin = () => {
-    // Use Google OAuth for authentication
-    window.location.href = `http://localhost:3001/auth/google?redirectTo=${encodeURIComponent(from)}`;
+    // Get the production API URL from env or use localhost for development
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    // Use Google OAuth for authentication - ensure redirectTo has the hash format
+    const redirectPath = from.startsWith('/') ? `/#${from}` : `/#/${from}`;
+    window.location.href = `${apiUrl}/auth/google?redirectTo=${encodeURIComponent(redirectPath)}`;
   };
 
   return (

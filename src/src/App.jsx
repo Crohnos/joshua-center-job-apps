@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import PrivateRoute from '../components/PrivateRoute';
 import './App.css';
 
@@ -27,7 +27,7 @@ function App() {
       {/* Background pattern */}
       <div className="app-bg"></div>
       
-      <BrowserRouter>
+      <Router>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Navigate to="/form/step1" replace />} />
@@ -82,7 +82,7 @@ function App() {
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </>
   );
 }
