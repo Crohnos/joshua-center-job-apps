@@ -15,13 +15,21 @@ function LoginPage() {
     const verifyAuth = async () => {
       try {
         setLoading(true);
+        console.log('Verifying authentication on login page...');
         const result = await checkAuth();
+        console.log('Auth check result:', result);
+        
         if (result.authenticated) {
+          console.log('User is authenticated, redirecting to:', from);
           navigate(from, { replace: true });
+        } else {
+          console.log('User is not authenticated, showing login button');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
       } finally {
+        // Always set loading to false, even if there's an error
+        console.log('Auth check completed, loading set to false');
         setLoading(false);
       }
     };

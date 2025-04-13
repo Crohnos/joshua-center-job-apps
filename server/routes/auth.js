@@ -112,12 +112,45 @@ router.get('/check-auth', (req, res) => {
   console.log('Session data:', req.session);
   console.log('Session cookie:', req.cookies);
   console.log('User:', req.user);
+  console.log('Headers:', {
+    origin: req.headers.origin,
+    referer: req.headers.referer,
+    'user-agent': req.headers['user-agent'],
+    cookie: req.headers.cookie,
+    'content-type': req.headers['content-type']
+  });
   console.log('=== END CHECK AUTH DEBUG ===');
   
+  // Set CORS headers explicitly for this route
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie, Authorization');
+  
+  // Set cache control to prevent caching of auth status
+  res.setHeader('Cache-Control', 'no-store');
+  
   if (req.isAuthenticated()) {
-    return res.status(200).json({ authenticated: true, user: req.user });
+    // Clean user object to avoid circular references
+    const safeUserData = {
+      id: req.user.id || null,
+      email: req.user.email || null,
+      name: req.user.name || null,
+      firstName: req.user.firstName || null,
+      lastName: req.user.lastName || null
+    };
+    
+    return res.status(200).json({ 
+      authenticated: true, 
+      user: safeUserData,
+      sessionId: req.sessionID
+    });
   }
-  return res.status(401).json({ authenticated: false });
+  
+  return res.status(200).json({ 
+    authenticated: false, 
+    message: 'Not authenticated',
+    sessionId: req.sessionID 
+  });
 });
 
 // Development endpoint for quick login without Google OAuth

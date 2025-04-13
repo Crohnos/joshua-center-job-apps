@@ -23,15 +23,28 @@ app.use(express.json());
 const corsOptions = {
   // Allow multiple origins (both production and development)
   origin: function(origin, callback) {
+    console.log('CORS request from origin:', origin);
+    
+    // Define allowed origins - both with www and without
     const allowedOrigins = [
       process.env.CLIENT_URL || 'http://localhost:5173', 
       'https://joshua-center-job-apps-app.onrender.com',
+      'https://www.joshua-center-job-apps-app.onrender.com',
       // Local development 
       'http://localhost:3000',
       'http://127.0.0.1:5173'
     ];
+    
+    // Always allow the Render.com domain in production
+    if (process.env.NODE_ENV === 'production' && origin && origin.includes('onrender.com')) {
+      console.log('Allowing Render.com domain:', origin);
+      callback(null, true);
+      return;
+    }
+    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      console.log('CORS allowed for:', origin || 'no origin');
       callback(null, true);
     } else {
       console.log('Blocked by CORS:', origin);
@@ -41,7 +54,9 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Cache-Control', 'X-Requested-With', 'Accept'],
-  exposedHeaders: ['Set-Cookie', 'Authorization']
+  exposedHeaders: ['Set-Cookie', 'Authorization'],
+  // Set a long maxAge for the CORS preflight response cache
+  maxAge: 86400 // 24 hours
 };
 
 console.log('Setting up CORS with options:', {

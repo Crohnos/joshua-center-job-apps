@@ -41,11 +41,27 @@ export const getLocations = async () => {
 export const checkAuth = async () => {
   try {
     console.log('Checking authentication...');
-    const response = await api.get('/auth/check-auth');
-    console.log('Auth response:', response.data);
+    console.log('API URL for auth check:', `${api.defaults.baseURL}/auth/check-auth`);
+    console.log('Cookie details:', document.cookie);
+    
+    // Set explicit timeout to prevent hanging
+    const response = await api.get('/auth/check-auth', {
+      timeout: 5000, // 5 second timeout
+      withCredentials: true // Explicitly set for this request
+    });
+    
+    console.log('Auth response status:', response.status);
+    console.log('Auth response headers:', response.headers);
+    console.log('Auth response data:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Auth check error:', error.response?.data || error.message);
+    console.error('Auth check error:');
+    console.error('  Message:', error.message);
+    console.error('  Status:', error.response?.status);
+    console.error('  Data:', error.response?.data);
+    console.error('  Request config:', error.config);
+    
+    // Always return unauthorized to avoid stuck UI
     return { authenticated: false };
   }
 };
