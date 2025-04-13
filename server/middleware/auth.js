@@ -162,23 +162,31 @@ function isAdmin(req, res, next) {
   console.log('isAdmin middleware called');
   console.log('User in request:', req.user);
   console.log('isAuthenticated:', req.isAuthenticated());
-  console.log('Session:', req.session);
+  console.log('Session ID:', req.sessionID);
+  console.log('Headers:', req.headers);
   
-  if (!req.user) {
-    console.log('No user in request, returning 401');
-    return res.status(401).send('Unauthorized');
+  if (!req.isAuthenticated() || !req.user) {
+    console.log('No authenticated user in request, returning 401');
+    return res.status(401).json({ 
+      error: 'Unauthorized', 
+      authenticated: false,
+      message: 'Please log in again'
+    });
   }
   
   console.log('Checking if user is active in database:', req.user.email);
   db.get('SELECT * FROM User WHERE email = ? AND active = 1', [req.user.email], (err, row) => {
     if (err) {
       console.error('Database error in isAdmin:', err);
-      return res.status(500).send('Server Error');
+      return res.status(500).json({ error: 'Server Error' });
     }
     
     if (!row) {
       console.log('User not found or not active:', req.user.email);
-      return res.status(403).send('Forbidden');
+      return res.status(403).json({ 
+        error: 'Forbidden',
+        message: 'Your account is not active or does not have admin privileges'
+      });
     }
     
     console.log('User is active admin:', row);

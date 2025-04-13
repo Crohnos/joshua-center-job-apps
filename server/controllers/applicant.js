@@ -128,6 +128,12 @@ function submitApplicant(req, res) {
 }
 
 function getApplicants(req, res) {
+  console.log('getApplicants called, authenticated user:', req.user?.email);
+  
+  // Debug session info 
+  console.log('Session in getApplicants:', req.session);
+  console.log('IsAuthenticated in getApplicants:', req.isAuthenticated());
+  
   const query = `
     SELECT a.id, a.email, a.name, a.application_status, a.assigned_employee_id,
            u.first_name || ' ' || u.last_name as assigned_to
@@ -141,6 +147,9 @@ function getApplicants(req, res) {
       console.error('Error fetching applicants:', err);
       return res.status(500).send(`Error fetching applicants: ${err.message}`);
     }
+    
+    console.log(`Returning ${rows.length} applicants`);
+    res.setHeader('Cache-Control', 'no-store');
     res.json(rows);
   });
 }
