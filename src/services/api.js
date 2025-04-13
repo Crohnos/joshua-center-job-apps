@@ -103,18 +103,70 @@ export const getUsers = async () => {
 };
 
 export const addUser = async (data) => {
-  const response = await api.post('/api/users', data);
-  return response.data;
+  try {
+    const response = await api.post('/api/users', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding user:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const updateUser = async (id, data) => {
-  const response = await api.put(`/api/users/${id}`, data);
-  return response.data;
+  try {
+    const response = await api.put(`/api/users/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const deleteUser = async (id) => {
-  const response = await api.delete(`/api/users/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(`/api/users/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Location API functions
+export const addLocation = async (data) => {
+  try {
+    console.log('Adding location:', data);
+    const response = await api.post('/api/locations', data);
+    console.log('Location added:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding location:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const updateLocation = async (id, data) => {
+  try {
+    console.log('Updating location:', id, data);
+    const response = await api.put(`/api/locations/${id}`, data);
+    console.log('Location updated:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating location:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteLocation = async (id) => {
+  try {
+    console.log('Deleting location:', id);
+    const response = await api.delete(`/api/locations/${id}`);
+    console.log('Location deleted:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting location:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export default api;

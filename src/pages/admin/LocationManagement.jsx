@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getLocations } from '../../services/api';
+import { getLocations, addLocation, updateLocation, deleteLocation } from '../../services/api';
 import { useForm } from 'react-hook-form';
 import AdminNavbar from '../../components/AdminNavbar';
-import axios from 'axios';
 
 function LocationManagement() {
   const queryClient = useQueryClient();
@@ -39,9 +38,9 @@ function LocationManagement() {
   const onSubmit = async (data) => {
     try {
       if (modalMode === 'add') {
-        await axios.post('http://localhost:3001/api/locations', data);
+        await addLocation(data);
       } else {
-        await axios.put(`http://localhost:3001/api/locations/${editingLocation.id}`, data);
+        await updateLocation(editingLocation.id, data);
       }
       
       // Refresh location list and close modal
@@ -58,7 +57,7 @@ function LocationManagement() {
     if (!confirm('Are you sure you want to delete this location?')) return;
     
     try {
-      await axios.delete(`http://localhost:3001/api/locations/${id}`);
+      await deleteLocation(id);
       queryClient.invalidateQueries({ queryKey: ['locations'] });
     } catch (error) {
       console.error('Error deleting location:', error);
