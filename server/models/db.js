@@ -2,10 +2,6 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-// Environment configuration - respect NODE_ENV
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
-const LOG_LEVEL = process.env.LOG_LEVEL || (IS_PRODUCTION ? 'error' : 'debug');
-
 // Database path configuration
 const DB_NAME = process.env.DB_NAME || 'joshua_center.db';
 const dataDir = process.env.DATA_DIR || path.join(__dirname, '../data');
@@ -18,19 +14,11 @@ if (!fs.existsSync(dataDir)) {
 // Database file path
 const dbPath = path.join(dataDir, DB_NAME);
 
-// Conditional logging for development only
-if (LOG_LEVEL === 'debug') {
-  console.log(`Using database at: ${dbPath}`);
-  console.log(`Database exists: ${fs.existsSync(dbPath)}`);
-}
-
 // Create database connection with error handling
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Database connection error:', err);
     throw err; // Fatal error, can't proceed without database
-  } else if (LOG_LEVEL === 'debug') {
-    console.log('Connected to SQLite database');
   }
 });
 

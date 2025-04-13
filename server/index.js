@@ -47,54 +47,13 @@ app.set('trust proxy', 1);
 // Middleware
 app.use(express.json());
 
-// Set up CORS with appropriate settings for cross-domain cookies
+// Simple CORS configuration - allow all origins for this application
 const corsOptions = {
-  // Allow multiple origins (both production and development)
-  origin: function(origin, callback) {
-    console.log('[PRODUCTION DEBUG] CORS request from origin:', origin);
-    
-    // In production mode, for debugging let's allow all origins
-    if (IS_PRODUCTION) {
-      console.log('[PRODUCTION DEBUG] Production mode: allowing all origins temporarily for debugging');
-      return callback(null, true);
-    }
-
-    // Define allowed origins
-    const allowedOrigins = [
-      process.env.CLIENT_URL || 'http://localhost:5173', 
-      'https://joshua-center-job-apps-app.onrender.com',
-      'https://www.joshua-center-job-apps-app.onrender.com',
-      'https://joshua-center-job-apps.onrender.com',
-      'https://www.joshua-center-job-apps.onrender.com',
-      // Local development 
-      'http://localhost:3000',
-      'http://127.0.0.1:5173'
-    ];
-    
-    console.log('[PRODUCTION DEBUG] Allowed origins:', allowedOrigins);
-    
-    // Allow requests with no origin in development (like mobile apps or curl requests)
-    if (!origin) {
-      console.log('[PRODUCTION DEBUG] No origin provided, allowing request');
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('onrender.com')) {
-      console.log('[PRODUCTION DEBUG] Origin matched or is Render domain, allowing request');
-      callback(null, true);
-    } else {
-      console.log('[PRODUCTION DEBUG] Origin not in allowed list', origin);
-      // For debugging purposes, we'll allow all origins temporarily
-      callback(null, true);
-      // When debugging is complete, uncomment this and comment the line above:
-      // callback(null, false);
-    }
-  },
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'Cache-Control', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Set-Cookie', 'Authorization'],
-  // Set a long maxAge for the CORS preflight response cache
   maxAge: 86400 // 24 hours
 };
 
@@ -179,26 +138,43 @@ async function initializeDatabase() {
     console.log('Initializing database...');
     
     // Read and execute the SQL schema
-    const sql = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
+    const schema = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
     
-    db.exec(sql, (err) => {
+    db.exec(schema, async (err) => {
       if (err) {
         console.error('Database initialization error:', err);
-      } else {
-        console.log('Database initialized successfully');
+        return;
+      } 
+      
+      console.log('Database schema initialized');
+      
+      // Check if we need to add sample data
+      db.get('SELECT COUNT(*) as count FROM Applicant', async (err, result) => {
+        if (err) {
+          console.error('Error checking applicant count:', err);
+          return;
+        }
         
-        // Check applicant count
-        db.get('SELECT COUNT(*) as count FROM Applicant', (err, result) => {
-          if (err) {
-            console.error('Error checking applicant count:', err);
-            return;
+        // If database is empty, add essential sample data
+        if (result.count === 0) {
+          console.log('Adding sample data...');
+          try {
+            // Load and execute essential data SQL
+            const sampleData = await fs.readFile(path.join(__dirname, 'models/essential_data.sql'), 'utf8');
+            db.exec(sampleData, (err) => {
+              if (err) {
+                console.error('Error adding sample data:', err);
+              } else {
+                console.log('Sample data added successfully');
+              }
+            });
+          } catch (err) {
+            console.error('Error reading sample data file:', err);
           }
-          
-          console.log(`Database contains ${result.count} applicants`);
-          
-          // No automated mock data generation - must run populate_db.js script manually
-        });
-      }
+        } else {
+          console.log(`Database already contains ${result.count} applicants`);
+        }
+      });
     });
   } catch (err) {
     console.error('Failed to read SQL file:', err);
