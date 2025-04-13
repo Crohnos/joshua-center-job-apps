@@ -53,8 +53,8 @@ function FormStep1() {
         setStep('verification');
         startCountdown();
         
-        // Only auto-fill the code if we're in development and it was provided
-        if (import.meta.env.DEV && result.code) {
+        // Auto-fill the code for the demo version
+        if (result.code) {
           setVerificationCode(result.code);
         }
       }
@@ -110,8 +110,8 @@ function FormStep1() {
       if (result.message) {
         startCountdown();
         
-        // Only auto-fill the code if we're in development and it was provided
-        if (import.meta.env.DEV && result.code) {
+        // Auto-fill the code for the demo version
+        if (result.code) {
           setVerificationCode(result.code);
         }
       }
@@ -290,7 +290,7 @@ function FormStep1() {
           <div className="card">
             <div className="form-section">
               <h2 className="form-section-heading">Verify Your Email</h2>
-              <p>We've sent a verification code to <strong>{email}</strong>. Please check your inbox (and spam folder) and enter the code below.</p>
+              <p>We've sent a verification code to <strong>{email}</strong>. Please enter the code below.</p>
               <div className="alert info" style={{ marginBottom: '1.5rem' }}>
                 <div className="alert-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -300,8 +300,8 @@ function FormStep1() {
                   </svg>
                 </div>
                 <div className="alert-content">
-                  <div className="alert-title">Check Your Email</div>
-                  <p>A 6-digit verification code has been sent to your email address. The email will come from <strong>noreply@thejoshuacenter.com</strong>.</p>
+                  <div className="alert-title">Verification Code</div>
+                  <p>For this demo version, the verification code is automatically prefilled.</p>
                 </div>
               </div>
               
