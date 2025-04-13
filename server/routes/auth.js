@@ -7,7 +7,15 @@ router.get('/google', (req, res, next) => {
   // Store redirect URL in session if provided
   if (req.query.redirectTo) {
     req.session.redirectTo = req.query.redirectTo;
+    console.log(`OAuth login initiated with redirectTo: ${req.query.redirectTo}`);
+  } else {
+    console.log('OAuth login initiated without redirect URL');
   }
+  
+  console.log(`Current Environment: ${process.env.NODE_ENV}`);
+  console.log(`Server URL: ${process.env.SERVER_URL}`);
+  console.log(`Client URL: ${process.env.CLIENT_URL}`);
+  console.log(`Render URL: ${process.env.RENDER_EXTERNAL_URL}`);
   
   const authOptions = { 
     scope: ['profile', 'email']
@@ -18,18 +26,29 @@ router.get('/google', (req, res, next) => {
 
 // OAuth callback handling
 router.get('/google/callback', 
+  (req, res, next) => {
+    console.log('Google OAuth callback received');
+    console.log(`Callback query params: ${JSON.stringify(req.query)}`);
+    next();
+  },
   passport.authenticate('google', { 
     failureRedirect: '/',
     failureMessage: true,
     session: true
   }), 
   (req, res) => {
+    console.log('OAuth authentication successful');
+    
     // If authentication failed with a message, redirect to login with error
     if (req.session.messages && req.session.messages.length) {
       const errorMsg = encodeURIComponent(req.session.messages[req.session.messages.length-1]);
       const errorUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=${errorMsg}`;
+      console.log(`Authentication error, redirecting to: ${errorUrl}`);
       return res.redirect(errorUrl);
     }
+    
+    console.log(`User authenticated: ${req.user?.email}`);
+    console.log(`Session redirectTo: ${req.session.redirectTo || '(none)'}`);
     
     // For form authentication, add email to query params
     if (req.session.redirectTo && req.session.redirectTo.startsWith('/form')) {
@@ -39,6 +58,7 @@ router.get('/google/callback',
         : `/#${req.session.redirectTo}`;
       
       const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}?email=${encodeURIComponent(req.user.email)}`;
+      console.log(`Form auth redirect to: ${redirectUrl}`);
       return res.redirect(redirectUrl);
     }
     
@@ -50,6 +70,7 @@ router.get('/google/callback',
     // Use absolute URL for redirection 
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
     
+    console.log(`Redirecting after auth to: ${redirectUrl}`);
     res.redirect(redirectUrl);
     delete req.session.redirectTo;
   });
@@ -65,12 +86,21 @@ router.get('/logout', (req, res) => {
 
 // Check authentication status
 router.get('/check-auth', (req, res) => {
+  console.log('Check Auth endpoint accessed');
+  
+  // Log request headers for debugging
+  console.log(`Request origin: ${req.headers.origin}`);
+  console.log(`Headers: ${JSON.stringify(req.headers)}`);
+  
   // Set CORS headers explicitly for this route
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
+  
+  console.log(`Session ID: ${req.sessionID || 'none'}`);
+  console.log(`Is Authenticated: ${req.isAuthenticated()}`);
   
   if (req.isAuthenticated()) {
     // Clean user object to avoid circular references
@@ -83,11 +113,15 @@ router.get('/check-auth', (req, res) => {
       isAdmin: req.user.isAdmin || false
     };
     
+    console.log(`Returning authenticated user: ${safeUserData.email}`);
+    
     return res.status(200).json({ 
       authenticated: true, 
       user: safeUserData
     });
   }
+  
+  console.log('User not authenticated');
   
   return res.status(200).json({ 
     authenticated: false, 
@@ -116,5 +150,25 @@ if (process.env.NODE_ENV !== 'production' && process.env.USE_DEV_MODE === 'true'
     });
   });
 }
+
+// OAuth config test endpoint (available in all environments)
+router.get('/oauth-config', (req, res) => {
+  const { passport } = require('../middleware/auth');
+  
+  // Get Google strategy configuration
+  let googleStrategy = null;
+  passport._strategies.google && (googleStrategy = passport._strategies.google);
+  
+  const config = {
+    environment: process.env.NODE_ENV,
+    renderUrl: process.env.RENDER_EXTERNAL_URL,
+    serverUrl: process.env.SERVER_URL,
+    clientUrl: process.env.CLIENT_URL,
+    oauthCallbackConfigured: googleStrategy ? googleStrategy._oauth2._customHeaders.callbackURL : 'unknown',
+    strategyName: googleStrategy ? googleStrategy.name : 'unknown'
+  };
+  
+  res.json(config);
+});
 
 module.exports = router;
