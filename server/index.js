@@ -181,14 +181,30 @@ async function initializeDatabase() {
                 // Also add additional sample data
                 try {
                   const additionalData = await fs.readFile(path.join(__dirname, 'models/additional_data.sql'), 'utf8');
-                  db.exec(additionalData, (err) => {
+                  db.exec(additionalData, async (err) => {
                     if (err) {
                       console.error('Error adding additional sample data:', err);
                     } else {
                       console.log('Additional sample data added successfully');
                       
-                      // Generate sample PDFs for the resumes after data is added
-                      generateSamplePDFs();
+                      // Also add users data
+                      try {
+                        const usersData = await fs.readFile(path.join(__dirname, 'models/users_data.sql'), 'utf8');
+                        db.exec(usersData, (err) => {
+                          if (err) {
+                            console.error('Error adding users data:', err);
+                          } else {
+                            console.log('Users data added successfully');
+                          }
+                          
+                          // Generate sample PDFs for the resumes after all data is added
+                          generateSamplePDFs();
+                        });
+                      } catch (err) {
+                        console.error('Error reading users data file:', err);
+                        // Still generate PDFs even if users data fails
+                        generateSamplePDFs();
+                      }
                     }
                   });
                 } catch (err) {
@@ -202,8 +218,39 @@ async function initializeDatabase() {
         } else {
           console.log(`Database already contains ${result.count} applicants`);
           
-          // Even if the database already has data, make sure PDFs exist
-          generateSamplePDFs();
+          // Check if we need to add user data
+          db.get('SELECT COUNT(*) as count FROM User', async (err, userResult) => {
+            if (err) {
+              console.error('Error checking user count:', err);
+              generateSamplePDFs();
+              return;
+            }
+            
+            // If we have only the default dev user or no users at all
+            if (userResult.count <= 1) {
+              console.log('Adding sample user data...');
+              try {
+                const usersData = await fs.readFile(path.join(__dirname, 'models/users_data.sql'), 'utf8');
+                db.exec(usersData, (err) => {
+                  if (err) {
+                    console.error('Error adding users data:', err);
+                  } else {
+                    console.log('Users data added successfully');
+                  }
+                  
+                  // Generate sample PDFs
+                  generateSamplePDFs();
+                });
+              } catch (err) {
+                console.error('Error reading users data file:', err);
+                generateSamplePDFs();
+              }
+            } else {
+              console.log(`Database already contains ${userResult.count} users`);
+              // Even if the database already has data, make sure PDFs exist
+              generateSamplePDFs();
+            }
+          });
         }
       });
     });
