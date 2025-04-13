@@ -2,6 +2,7 @@ const db = require('../models/db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const emailService = require('../services/email');
 
 // Store verification codes in memory (in production, you'd use a database)
 const verificationCodes = new Map();
@@ -280,8 +281,8 @@ function checkEmailExists(req, res) {
   });
 }
 
-// Generate and send verification code (simulated)
-function sendVerificationCode(req, res) {
+// Generate and send verification code
+async function sendVerificationCode(req, res) {
   const { email } = req.body;
   
   if (!email) {
@@ -303,16 +304,36 @@ function sendVerificationCode(req, res) {
     expires: Date.now() + (15 * 60 * 1000) // 15 minutes
   });
   
-  // In a real implementation, you would send an email here
-  console.log(`[DEV] Verification code for ${email}: ${code}`);
-  
-  // For demo purposes, we'll return the code in the response
-  // In production, you would only send it via email
-  res.json({ 
-    message: 'Verification code sent',
-    // In production remove this line and actually send an email
-    code // Only include this in development
-  });
+  try {
+    // Send the verification email
+    const emailResult = await emailService.sendVerificationEmail(email, code);
+    
+    if (!emailResult.success) {
+      console.error('Email sending failed:', emailResult.error);
+      return res.status(500).json({ 
+        error: 'Failed to send verification email. Please try again later.' 
+      });
+    }
+    
+    // Log for debugging in development
+    const isDev = process.env.NODE_ENV !== 'production';
+    if (isDev) {
+      console.log(`[DEV] Verification code for ${email}: ${code}`);
+      if (emailResult.previewUrl) {
+        console.log(`[DEV] Email preview URL: ${emailResult.previewUrl}`);
+      }
+    }
+    
+    // Return success response
+    // In development we still include the code for easier testing
+    res.json({ 
+      message: 'Verification code sent',
+      ...(isDev ? { code } : {}) // Only include code in development
+    });
+  } catch (error) {
+    console.error('Error in verification process:', error);
+    res.status(500).json({ error: 'Server error sending verification code' });
+  }
 }
 
 // Verify code

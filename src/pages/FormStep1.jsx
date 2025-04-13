@@ -53,8 +53,8 @@ function FormStep1() {
         setStep('verification');
         startCountdown();
         
-        // For development, auto-fill the code
-        if (result.code) {
+        // Only auto-fill the code if we're in development and it was provided
+        if (import.meta.env.DEV && result.code) {
           setVerificationCode(result.code);
         }
       }
@@ -110,8 +110,8 @@ function FormStep1() {
       if (result.message) {
         startCountdown();
         
-        // For development, auto-fill the code
-        if (result.code) {
+        // Only auto-fill the code if we're in development and it was provided
+        if (import.meta.env.DEV && result.code) {
           setVerificationCode(result.code);
         }
       }
@@ -290,7 +290,20 @@ function FormStep1() {
           <div className="card">
             <div className="form-section">
               <h2 className="form-section-heading">Verify Your Email</h2>
-              <p>We've sent a verification code to <strong>{email}</strong>. Please check your inbox and enter the code below.</p>
+              <p>We've sent a verification code to <strong>{email}</strong>. Please check your inbox (and spam folder) and enter the code below.</p>
+              <div className="alert info" style={{ marginBottom: '1.5rem' }}>
+                <div className="alert-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                </div>
+                <div className="alert-content">
+                  <div className="alert-title">Check Your Email</div>
+                  <p>A 6-digit verification code has been sent to your email address. The email will come from <strong>noreply@thejoshuacenter.com</strong>.</p>
+                </div>
+              </div>
               
               <form onSubmit={handleSubmitCode}>
                 {error && (
