@@ -2,72 +2,32 @@ const express = require('express');
 const { passport } = require('../middleware/auth');
 const router = express.Router();
 
+// Google OAuth login route
 router.get('/google', (req, res, next) => {
-  console.log('=== AUTH DEBUG ===');
-  console.log('Auth route hit: /google');
-  console.log('req.session:', req.session);
-  console.log('Session ID:', req.sessionID);
-  console.log('Environment variables:', {
-    NODE_ENV: process.env.NODE_ENV,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ? 'Set' : 'Not set',
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Not set',
-    SESSION_SECRET: process.env.SESSION_SECRET ? 'Set' : 'Not set',
-    CLIENT_URL: process.env.CLIENT_URL,
-    SERVER_URL: process.env.SERVER_URL
-  });
-  
   // Store redirect URL in session if provided
   if (req.query.redirectTo) {
-    console.log(`Storing redirectTo: ${req.query.redirectTo}`);
     req.session.redirectTo = req.query.redirectTo;
   }
   
   const authOptions = { 
-    scope: ['profile', 'email'],
-    // Add dummy email to query for development mode
-    ...(process.env.NODE_ENV !== 'production' && !process.env.GOOGLE_CLIENT_ID && { 
-      state: JSON.stringify({ email: 'dev@example.com', name: 'Dev User' })
-    })
+    scope: ['profile', 'email']
   };
-  
-  console.log('Auth options:', authOptions);
-  console.log('=== END AUTH DEBUG ===');
   
   passport.authenticate('google', authOptions)(req, res, next);
 });
 
+// OAuth callback handling
 router.get('/google/callback', 
-  (req, res, next) => {
-    console.log('=== CALLBACK DEBUG - Before Authentication ===');
-    console.log('Callback route hit: /google/callback');
-    console.log('Session ID:', req.sessionID);
-    console.log('Session exists:', !!req.session);
-    console.log('Session data:', req.session);
-    console.log('Request query params:', req.query);
-    console.log('Request cookies:', req.headers.cookie);
-    console.log('=== END CALLBACK DEBUG - Before Authentication ===');
-    next();
-  },
   passport.authenticate('google', { 
     failureRedirect: '/',
     failureMessage: true,
-    session: true // Explicitly enable session
+    session: true
   }), 
   (req, res) => {
-    console.log('=== CALLBACK DEBUG - After Authentication ===');
-    console.log('Auth callback completed successfully');
-    console.log('Session ID:', req.sessionID);
-    console.log('Session data after auth:', req.session);
-    console.log('User authenticated:', !!req.user);
-    console.log('User details:', req.user);
-    console.log('RedirectTo from session:', req.session.redirectTo);
-    console.log('Messages:', req.session.messages);
-    
     // If authentication failed with a message, redirect to login with error
     if (req.session.messages && req.session.messages.length) {
       const errorMsg = encodeURIComponent(req.session.messages[req.session.messages.length-1]);
       const errorUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=${errorMsg}`;
-      console.log(`Auth failed with message. Redirecting to: ${errorUrl}`);
       return res.redirect(errorUrl);
     }
     
@@ -79,7 +39,6 @@ router.get('/google/callback',
         : `/#${req.session.redirectTo}`;
       
       const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}?email=${encodeURIComponent(req.user.email)}`;
-      console.log(`Form auth. Redirecting to: ${redirectUrl}`);
       return res.redirect(redirectUrl);
     }
     
@@ -90,13 +49,12 @@ router.get('/google/callback',
       
     // Use absolute URL for redirection 
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
-    console.log(`Admin auth. Redirecting to: ${redirectUrl}`);
-    console.log('=== END CALLBACK DEBUG - After Authentication ===');
     
     res.redirect(redirectUrl);
     delete req.session.redirectTo;
   });
 
+// Logout route
 router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).send('Error logging out');
@@ -105,29 +63,14 @@ router.get('/logout', (req, res) => {
   });
 });
 
+// Check authentication status
 router.get('/check-auth', (req, res) => {
-  console.log('=== CHECK AUTH DEBUG ===');
-  console.log('Check auth hit, session ID:', req.sessionID);
-  console.log('isAuthenticated:', req.isAuthenticated());
-  console.log('Session data:', req.session);
-  console.log('Session cookie:', req.cookies);
-  console.log('User:', req.user);
-  console.log('Headers:', {
-    origin: req.headers.origin,
-    referer: req.headers.referer,
-    'user-agent': req.headers['user-agent'],
-    cookie: req.headers.cookie,
-    'content-type': req.headers['content-type']
-  });
-  console.log('=== END CHECK AUTH DEBUG ===');
-  
   // Set CORS headers explicitly for this route
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie, Authorization');
-  
-  // Set cache control to prevent caching of auth status
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   
   if (req.isAuthenticated()) {
     // Clean user object to avoid circular references
@@ -136,32 +79,28 @@ router.get('/check-auth', (req, res) => {
       email: req.user.email || null,
       name: req.user.name || null,
       firstName: req.user.firstName || null,
-      lastName: req.user.lastName || null
+      lastName: req.user.lastName || null,
+      isAdmin: req.user.isAdmin || false
     };
     
     return res.status(200).json({ 
       authenticated: true, 
-      user: safeUserData,
-      sessionId: req.sessionID
+      user: safeUserData
     });
   }
   
   return res.status(200).json({ 
     authenticated: false, 
-    message: 'Not authenticated',
-    sessionId: req.sessionID 
+    message: 'Not authenticated'
   });
 });
 
 // Development endpoint for quick login without Google OAuth
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && process.env.USE_DEV_MODE === 'true') {
   router.get('/dev-login', (req, res) => {
-    console.log('Development login endpoint hit');
-    
     // Log in the user with the dev account
-    req.login({ email: 'dev@example.com', name: 'Dev User' }, err => {
+    req.login({ email: 'dev@example.com', name: 'Dev User', isAdmin: true }, err => {
       if (err) {
-        console.error('Error during dev login:', err);
         return res.status(500).json({ error: err.message });
       }
       

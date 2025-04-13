@@ -1,131 +1,143 @@
 import axios from 'axios';
 
-// Log API URL to help with debugging
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-console.log('API URL:', apiUrl);
-
 // Create axios instance with defaults
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const api = axios.create({
-  // Use absolute URLs for production
   baseURL: apiUrl,
-  withCredentials: true, // This is crucial for cookies to be sent
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 10000 // 10 second default timeout
 });
 
-// Add an interceptor to include credentials with every request
-api.interceptors.request.use(config => {
-  config.withCredentials = true;
-  return config;
-});
+// Create error handler utility
+const handleApiError = (error, defaultReturn = null) => {
+  // Structured error logging for debugging
+  const errorDetails = {
+    message: error.message,
+    status: error.response?.status,
+    data: error.response?.data
+  };
+  
+  if (import.meta.env.DEV) {
+    console.error('API Error:', errorDetails);
+  }
+  
+  // For authentication errors, throw the error to be handled by components
+  if (error.response?.status === 401 || error.response?.status === 403) {
+    throw error;
+  }
+  
+  // For other errors, return default value if provided
+  if (defaultReturn !== undefined) {
+    return defaultReturn;
+  }
+  
+  // Otherwise throw the error
+  throw error;
+};
 
 // API service functions
 export const submitApplication = async (formData, resumeFile) => {
-  const data = new FormData();
-  data.append('data', JSON.stringify(formData));
-  data.append('resume', resumeFile);
-  
-  return api.post('/api/applicants', data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  try {
+    const data = new FormData();
+    data.append('data', JSON.stringify(formData));
+    if (resumeFile) {
+      data.append('resume', resumeFile);
+    }
+    
+    const response = await api.post('/api/applicants', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 export const getLocations = async () => {
-  const response = await api.get('/api/locations');
-  return response.data;
+  try {
+    const response = await api.get('/api/locations');
+    return response.data;
+  } catch (error) {
+    return handleApiError(error, []);
+  }
 };
 
 export const checkAuth = async () => {
   try {
-    console.log('Checking authentication...');
-    console.log('API URL for auth check:', `${api.defaults.baseURL}/auth/check-auth`);
-    console.log('Cookie details:', document.cookie);
-    
-    // Set explicit timeout to prevent hanging
-    const response = await api.get('/auth/check-auth', {
-      timeout: 5000, // 5 second timeout
-      withCredentials: true // Explicitly set for this request
-    });
-    
-    console.log('Auth response status:', response.status);
-    console.log('Auth response headers:', response.headers);
-    console.log('Auth response data:', response.data);
+    const response = await api.get('/auth/check-auth');
     return response.data;
   } catch (error) {
-    console.error('Auth check error:');
-    console.error('  Message:', error.message);
-    console.error('  Status:', error.response?.status);
-    console.error('  Data:', error.response?.data);
-    console.error('  Request config:', error.config);
-    
-    // Always return unauthorized to avoid stuck UI
-    return { authenticated: false };
+    return handleApiError(error, { authenticated: false });
   }
 };
 
 // Email verification for form access
 export const sendVerificationCode = async (email) => {
-  const response = await api.post('/api/verify-email', { email });
-  return response.data;
+  try {
+    const response = await api.post('/api/verify-email', { email });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 export const verifyCode = async (email, code) => {
-  const response = await api.post('/api/verify-code', { email, code });
-  return response.data;
+  try {
+    const response = await api.post('/api/verify-code', { email, code });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 export const checkEmailExists = async (email) => {
-  const response = await api.get(`/api/check-email/${encodeURIComponent(email)}`);
-  return response.data;
+  try {
+    const response = await api.get(`/api/check-email/${encodeURIComponent(email)}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 export const getApplicants = async () => {
   try {
-    console.log('Fetching applicants...');
-    console.log('API config:', {
-      baseURL: api.defaults.baseURL,
-      withCredentials: api.defaults.withCredentials,
-      headers: api.defaults.headers
-    });
-    
-    // Use the default api instance which already has withCredentials set
     const response = await api.get('/api/applicants');
-    console.log('Applicants response status:', response.status);
-    console.log('Applicants response headers:', response.headers);
-    console.log('Applicants response data:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching applicants:', error);
-    console.error('Response data:', error.response?.data);
-    console.error('Response status:', error.response?.status);
-    console.error('Response headers:', error.response?.headers);
-    return [];
+    return handleApiError(error, []);
   }
 };
 
 export const getApplicant = async (id) => {
-  const response = await api.get(`/api/applicants/${id}`);
-  return response.data;
+  try {
+    const response = await api.get(`/api/applicants/${id}`);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 export const updateApplicant = async (id, data) => {
-  const response = await api.put(`/api/applicants/${id}`, data);
-  return response.data;
+  try {
+    const response = await api.put(`/api/applicants/${id}`, data);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 export const getUsers = async () => {
   try {
-    console.log('Fetching users...');
-    // Use the default api instance which already has withCredentials set
     const response = await api.get('/api/users');
-    console.log('Users response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching users:', error.response?.data || error.message);
-    return [];
+    return handleApiError(error, []);
   }
 };
 
@@ -134,8 +146,7 @@ export const addUser = async (data) => {
     const response = await api.post('/api/users', data);
     return response.data;
   } catch (error) {
-    console.error('Error adding user:', error.response?.data || error.message);
-    throw error;
+    return handleApiError(error);
   }
 };
 
@@ -144,8 +155,7 @@ export const updateUser = async (id, data) => {
     const response = await api.put(`/api/users/${id}`, data);
     return response.data;
   } catch (error) {
-    console.error('Error updating user:', error.response?.data || error.message);
-    throw error;
+    return handleApiError(error);
   }
 };
 
@@ -154,45 +164,35 @@ export const deleteUser = async (id) => {
     const response = await api.delete(`/api/users/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting user:', error.response?.data || error.message);
-    throw error;
+    return handleApiError(error);
   }
 };
 
 // Location API functions
 export const addLocation = async (data) => {
   try {
-    console.log('Adding location:', data);
     const response = await api.post('/api/locations', data);
-    console.log('Location added:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error adding location:', error.response?.data || error.message);
-    throw error;
+    return handleApiError(error);
   }
 };
 
 export const updateLocation = async (id, data) => {
   try {
-    console.log('Updating location:', id, data);
     const response = await api.put(`/api/locations/${id}`, data);
-    console.log('Location updated:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error updating location:', error.response?.data || error.message);
-    throw error;
+    return handleApiError(error);
   }
 };
 
 export const deleteLocation = async (id) => {
   try {
-    console.log('Deleting location:', id);
     const response = await api.delete(`/api/locations/${id}`);
-    console.log('Location deleted:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error deleting location:', error.response?.data || error.message);
-    throw error;
+    return handleApiError(error);
   }
 };
 

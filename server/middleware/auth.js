@@ -7,141 +7,97 @@ const db = require('../models/db');
 
 // Setup passport and session
 const passportSetup = () => {
-  console.log('=== PASSPORT SETUP DEBUG ===');
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
   const SESSION_SECRET = process.env.SESSION_SECRET;
+  const SERVER_URL = process.env.SERVER_URL || 'http://localhost:3001';
+  const IS_PRODUCTION = process.env.NODE_ENV === 'production';
   
-  console.log('OAuth Config:', {
-    GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID ? 'Set' : 'Not set',
-    GOOGLE_CLIENT_SECRET: GOOGLE_CLIENT_SECRET ? 'Set' : 'Not set',
-    SESSION_SECRET: SESSION_SECRET ? 'Set' : 'Not set',
-    callbackURL: `${process.env.SERVER_URL || 'http://localhost:3001'}/auth/google/callback`
-  });
-
-  // Create a custom dummy strategy for development
-  const DummyStrategy = function() {
-    this.name = 'google';
-    this.authenticate = function(req, options) {
-      console.log('DummyStrategy.authenticate called with options:', options);
-      console.log('Request session in dummy strategy:', req.session);
-      const email = 'dev@example.com';
-      const user = { email: email, name: 'Dev User' };
-      console.log('Creating dummy user:', user);
-      return this.success(user);
+  // Use development mode only if explicitly set and not in production
+  const USE_DEV_MODE = process.env.USE_DEV_MODE === 'true' && !IS_PRODUCTION;
+  
+  if (USE_DEV_MODE) {
+    // DummyStrategy for development only - never runs in production
+    const DummyStrategy = function() {
+      this.name = 'google';
+      this.authenticate = function(req) {
+        const email = 'dev@example.com';
+        const user = { email: email, name: 'Dev User' };
+        return this.success(user);
+      };
     };
-  };
-
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-    console.warn('Google OAuth credentials not set. Using dummy strategy for development.');
-    console.log('Initializing DummyStrategy for development');
     
-    // Use the dummy strategy for development
     passport.use(new DummyStrategy());
+  } else if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    console.error('ERROR: Google OAuth credentials not set');
+    if (IS_PRODUCTION) {
+      throw new Error('Google OAuth credentials required in production');
+    } else {
+      console.warn('Development mode without OAuth credentials. Use USE_DEV_MODE=true for dev auth');
+    }
   } else {
     // Use the real Google strategy
-    console.log('Initializing real GoogleStrategy with credentials');
     const GoogleStrategy = require('passport-google-oauth20').Strategy;
     passport.use(new GoogleStrategy({
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.SERVER_URL || 'http://localhost:3001'}/auth/google/callback`,
+      callbackURL: `${SERVER_URL}/auth/google/callback`,
       proxy: true
-    }, (accessToken, refreshToken, profile, done) => {
+    }, async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('Google OAuth callback received');
-        console.log('Profile:', {
-          id: profile.id,
-          displayName: profile.displayName,
-          emails: profile.emails,
-          photos: profile.photos
-        });
-        
         // Extract user data from Google profile
         const email = profile.emails[0].value;
         const firstName = profile.name?.givenName || '';
         const lastName = profile.name?.familyName || '';
         const displayName = profile.displayName || `${firstName} ${lastName}`;
         
-        console.log('User data extracted:', { email, firstName, lastName, displayName });
-        
-        // Find or create user in database
-        console.log('Querying database for user:', email);
+        // Find user in database
         db.get('SELECT * FROM User WHERE email = ?', [email], (err, user) => {
           if (err) {
-            console.error('Database error during authentication:', err);
             return done(err);
           }
           
           if (user) {
-            // User exists, return the user
-            console.log(`User found in database:`, user);
+            // User exists, check if active
+            if (!user.active) {
+              return done(null, false, { message: 'Account is disabled' });
+            }
+            
+            // Return the user
             return done(null, { 
               id: user.id,
               email, 
               name: displayName,
               firstName: user.first_name,
               lastName: user.last_name,
-              active: user.active
+              active: user.active,
+              isAdmin: user.is_admin === 1
             });
           } else {
-            console.log('User not found in database:', email);
-            // Restrict to specific email for security during testing
-            if (email !== 'johncgraham1997@gmail.com') {
-              console.log(`Unauthorized email attempted login: ${email}`);
-              return done(null, false, { message: 'Unauthorized email' });
-            }
-            
-            // Create new user - for development only! In production you'd want admin approval
-            console.log(`Creating new user: ${email}`);
-            db.run(
-              'INSERT INTO User (email, first_name, last_name, active) VALUES (?, ?, ?, 1)',
-              [email, firstName, lastName],
-              function(err) {
-                if (err) {
-                  console.error('Error creating user:', err);
-                  return done(err);
-                }
-                console.log('User created successfully with ID:', this.lastID);
-                return done(null, { 
-                  id: this.lastID,
-                  email, 
-                  name: displayName,
-                  firstName,
-                  lastName,
-                  active: 1
-                });
-              }
-            );
+            // User not found - we don't create users automatically
+            // They must be pre-created by an admin
+            return done(null, false, { message: 'Unauthorized user' });
           }
         });
       } catch (error) {
-        console.error('Error in Google authentication strategy:', error);
         return done(error);
       }
     }));
   }
-  console.log('=== END PASSPORT SETUP DEBUG ===');
 };
 
 passport.serializeUser((user, done) => {
-  console.log('serializeUser called with user:', user);
-  const result = done(null, user.email);
-  console.log('User serialized with email:', user.email);
-  return result;
+  done(null, user.email);
 });
 
 passport.deserializeUser((email, done) => {
-  console.log('deserializeUser called with email:', email);
   db.get('SELECT * FROM User WHERE email = ?', [email], (err, user) => {
     if (err) {
-      console.error('Error in deserializeUser:', err);
       return done(err);
     }
     
     if (!user) {
-      console.log('User not found in deserializeUser for email:', email);
-      return done(null, { email }); // Basic user info if not in DB
+      return done(null, false);
     }
     
     const userData = { 
@@ -150,23 +106,17 @@ passport.deserializeUser((email, done) => {
       firstName: user.first_name,
       lastName: user.last_name,
       name: `${user.first_name} ${user.last_name}`,
-      active: user.active
+      active: user.active,
+      isAdmin: user.is_admin === 1
     };
     
-    console.log('User deserialized:', userData);
     done(null, userData);
   });
 });
 
+// Admin authorization middleware
 function isAdmin(req, res, next) {
-  console.log('isAdmin middleware called');
-  console.log('User in request:', req.user);
-  console.log('isAuthenticated:', req.isAuthenticated());
-  console.log('Session ID:', req.sessionID);
-  console.log('Headers:', req.headers);
-  
   if (!req.isAuthenticated() || !req.user) {
-    console.log('No authenticated user in request, returning 401');
     return res.status(401).json({ 
       error: 'Unauthorized', 
       authenticated: false,
@@ -174,23 +124,21 @@ function isAdmin(req, res, next) {
     });
   }
   
-  console.log('Checking if user is active in database:', req.user.email);
-  db.get('SELECT * FROM User WHERE email = ? AND active = 1', [req.user.email], (err, row) => {
+  // Check if user exists, is active, AND has admin role
+  db.get('SELECT * FROM User WHERE email = ? AND active = 1 AND is_admin = 1', [req.user.email], (err, row) => {
     if (err) {
-      console.error('Database error in isAdmin:', err);
       return res.status(500).json({ error: 'Server Error' });
     }
     
     if (!row) {
-      console.log('User not found or not active:', req.user.email);
       return res.status(403).json({ 
         error: 'Forbidden',
         message: 'Your account is not active or does not have admin privileges'
       });
     }
     
-    console.log('User is active admin:', row);
     req.user.id = row.id;
+    req.user.isAdmin = true;
     next();
   });
 }
@@ -198,11 +146,17 @@ function isAdmin(req, res, next) {
 // Initialize passport
 passportSetup();
 
-// Create session middleware with persistent SQLite storage
+// Create session middleware with secure configuration
 const sessionMiddleware = () => {
-  console.log('=== SESSION CONFIG DEBUG ===');
-  const sessionSecret = process.env.SESSION_SECRET || 'default-dev-secret';
-  console.log('Session secret:', sessionSecret ? `${sessionSecret.substring(0, 3)}...` : 'Not set');
+  const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+  const sessionSecret = process.env.SESSION_SECRET;
+  
+  if (!sessionSecret) {
+    console.error('ERROR: SESSION_SECRET must be set in environment variables');
+    if (IS_PRODUCTION) {
+      throw new Error('SESSION_SECRET required in production');
+    }
+  }
   
   // Ensure sessions directory exists
   const dataDir = path.join(__dirname, '../data');
@@ -212,7 +166,6 @@ const sessionMiddleware = () => {
   
   // Create a SQLite session store
   const sessionDBPath = path.join(dataDir, 'sessions.db');
-  console.log(`Using session database at: ${sessionDBPath}`);
   
   const sqliteStoreOptions = {
     db: 'sessions.db',
@@ -222,26 +175,18 @@ const sessionMiddleware = () => {
   
   const sessionConfig = {
     store: new SQLiteStore(sqliteStoreOptions),
-    secret: sessionSecret,
+    secret: sessionSecret || 'development-secret-do-not-use-in-production',
     resave: false,
-    saveUninitialized: true, // Changed to true to ensure session is always stored
+    saveUninitialized: false,
     proxy: true, // Trust the reverse proxy
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // Only use secure in production
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-domain cookies in production
+      secure: IS_PRODUCTION, // Only use secure in production
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: IS_PRODUCTION ? 'none' : 'lax',
       httpOnly: true,
-      path: '/',
-      domain: process.env.NODE_ENV === 'production' ? undefined : undefined // Let the browser set the domain
+      path: '/'
     }
   };
-  
-  console.log('Session config:', {
-    ...sessionConfig,
-    store: 'SQLiteStore',
-    secret: sessionConfig.secret ? `${sessionConfig.secret.substring(0, 3)}...` : 'Not set'
-  });
-  console.log('=== END SESSION CONFIG DEBUG ===');
   
   return session(sessionConfig);
 };

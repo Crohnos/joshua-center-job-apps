@@ -2,28 +2,71 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-// For Render.com, we MUST use the data directory for the database
-// since the root directory may be read-only in their container environment
-const dataDir = path.join(__dirname, '../data');
+// Environment configuration - respect NODE_ENV
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const LOG_LEVEL = process.env.LOG_LEVEL || (IS_PRODUCTION ? 'error' : 'debug');
+
+// Database path configuration
+const DB_NAME = process.env.DB_NAME || 'joshua_center.db';
+const dataDir = process.env.DATA_DIR || path.join(__dirname, '../data');
+
+// Ensure data directory exists
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-// Use the database in the data directory which will persist
-const dbPath = path.join(dataDir, 'joshua_center.db');
+// Database file path
+const dbPath = path.join(dataDir, DB_NAME);
 
-// Log detailed info about this database connection
-console.log(`Using database at: ${dbPath}`);
-console.log(`Database exists: ${fs.existsSync(dbPath)}`);
-console.log(`Full path: ${path.resolve(dbPath)}`);
+// Conditional logging for development only
+if (LOG_LEVEL === 'debug') {
+  console.log(`Using database at: ${dbPath}`);
+  console.log(`Database exists: ${fs.existsSync(dbPath)}`);
+}
 
-// Connect to the database - it will be created if it doesn't exist
+// Create database connection with error handling
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Database connection error:', err);
-  } else {
+    throw err; // Fatal error, can't proceed without database
+  } else if (LOG_LEVEL === 'debug') {
     console.log('Connected to SQLite database');
   }
 });
+
+// Enable foreign keys
+db.run('PRAGMA foreign_keys = ON', (err) => {
+  if (err) {
+    console.error('Error enabling foreign keys:', err);
+  }
+});
+
+// Add promise-based query methods
+db.asyncGet = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) return reject(err);
+      resolve(row);
+    });
+  });
+};
+
+db.asyncAll = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+};
+
+db.asyncRun = (sql, params = []) => {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function(err) {
+      if (err) return reject(err);
+      resolve({ lastID: this.lastID, changes: this.changes });
+    });
+  });
+};
 
 module.exports = db;

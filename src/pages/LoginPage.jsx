@@ -7,7 +7,9 @@ function LoginPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const from = location.state?.from || '/admin/applicants';
-  const [errorMessage, setErrorMessage] = useState(searchParams.get('error') || '');
+  const [errorMessage, setErrorMessage] = useState(
+    searchParams.get('error') || location.state?.error || ''
+  );
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -15,21 +17,15 @@ function LoginPage() {
     const verifyAuth = async () => {
       try {
         setLoading(true);
-        console.log('Verifying authentication on login page...');
         const result = await checkAuth();
-        console.log('Auth check result:', result);
         
         if (result.authenticated) {
-          console.log('User is authenticated, redirecting to:', from);
           navigate(from, { replace: true });
-        } else {
-          console.log('User is not authenticated, showing login button');
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        const errorMsg = error.response?.data?.message || error.message;
+        setErrorMessage(errorMsg);
       } finally {
-        // Always set loading to false, even if there's an error
-        console.log('Auth check completed, loading set to false');
         setLoading(false);
       }
     };
@@ -39,9 +35,7 @@ function LoginPage() {
   
   // Redirect to auth with return URL as query parameter
   const handleLogin = () => {
-    // Use absolute URLs for production
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    // Use Google OAuth for authentication - ensure redirectTo has the hash format
     const redirectPath = from.startsWith('/') ? `/#${from}` : `/#/${from}`;
     window.location.href = `${apiUrl}/auth/google?redirectTo=${encodeURIComponent(redirectPath)}`;
   };
@@ -73,7 +67,9 @@ function LoginPage() {
           </p>
           
           {loading ? (
-            <div>Checking authentication status...</div>
+            <div aria-busy="true">
+              Checking authentication status...
+            </div>
           ) : (
             <button 
               onClick={handleLogin} 
