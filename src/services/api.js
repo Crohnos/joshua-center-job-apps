@@ -93,9 +93,17 @@ export const checkEmailExists = async (email) => {
 
 export const getApplicants = async () => {
   try {
+    console.log('[PRODUCTION DEBUG] Client fetching applicants...');
+    console.log('[PRODUCTION DEBUG] API URL:', import.meta.env.VITE_API_URL || 'http://localhost:3001');
+    console.log('[PRODUCTION DEBUG] Current origin:', window.location.origin);
+    
     const response = await api.get('/api/applicants');
+    
+    console.log('[PRODUCTION DEBUG] Applicants fetch successful, count:', response.data?.length || 0);
     return response.data;
   } catch (error) {
+    console.error('[PRODUCTION DEBUG] Error fetching applicants:', error);
+    console.error('[PRODUCTION DEBUG] Error details:', error.response?.status, error.response?.data);
     return handleApiError(error, []);
   }
 };

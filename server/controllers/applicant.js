@@ -128,7 +128,13 @@ function submitApplicant(req, res) {
 }
 
 function getApplicants(req, res) {
-  console.log('getApplicants called');
+  console.log('[PRODUCTION DEBUG] getApplicants called');
+  console.log('[PRODUCTION DEBUG] Server environment:', process.env.NODE_ENV);
+  console.log('[PRODUCTION DEBUG] Server URL:', process.env.SERVER_URL);
+  console.log('[PRODUCTION DEBUG] Client URL:', process.env.CLIENT_URL);
+  console.log('[PRODUCTION DEBUG] Render URL:', process.env.RENDER_EXTERNAL_URL);
+  console.log('[PRODUCTION DEBUG] Request headers:', req.headers);
+  console.log('[PRODUCTION DEBUG] Request origin:', req.headers.origin);
   
   // Use the same database connection for consistency
   const query = `
@@ -139,13 +145,20 @@ function getApplicants(req, res) {
     ORDER BY a.id DESC
   `;
   
+  console.log('[PRODUCTION DEBUG] Executing query:', query);
+  
+  // Log database path
+  const dbPath = require('path').join(__dirname, '../data/joshua_center.db');
+  console.log('[PRODUCTION DEBUG] Database path:', dbPath);
+  console.log('[PRODUCTION DEBUG] Database exists:', require('fs').existsSync(dbPath));
+  
   db.all(query, (err, rows) => {
     if (err) {
-      console.error('Error fetching applicants:', err);
+      console.error('[PRODUCTION DEBUG] Error fetching applicants:', err);
       return res.status(500).json({ error: `Error fetching applicants: ${err.message}` });
     }
     
-    console.log(`Found ${rows.length} applicants in database`);
+    console.log(`[PRODUCTION DEBUG] Found ${rows.length} applicants in database`);
     
     // Check for null values that might cause issues
     const sanitizedRows = rows.map(row => {
@@ -159,6 +172,8 @@ function getApplicants(req, res) {
         assigned_to: row.assigned_to || null
       };
     });
+    
+    console.log('[PRODUCTION DEBUG] Responding with', sanitizedRows.length, 'applicants');
     
     res.setHeader('Cache-Control', 'no-store');
     res.json(sanitizedRows);

@@ -3,11 +3,19 @@ require('dotenv').config();
 
 // Set critical environment variables early
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+console.log('[PRODUCTION DEBUG] Server starting up...');
+console.log('[PRODUCTION DEBUG] Environment:', IS_PRODUCTION ? 'production' : 'development');
+console.log('[PRODUCTION DEBUG] Render URL:', process.env.RENDER_EXTERNAL_URL);
+console.log('[PRODUCTION DEBUG] Initial SERVER_URL:', process.env.SERVER_URL);
+console.log('[PRODUCTION DEBUG] Initial CLIENT_URL:', process.env.CLIENT_URL);
+
 if (IS_PRODUCTION && process.env.RENDER_EXTERNAL_URL) {
   // When running on Render.com, use the provided external URL
   process.env.SERVER_URL = process.env.RENDER_EXTERNAL_URL;
   process.env.CLIENT_URL = process.env.RENDER_EXTERNAL_URL;
-  console.log(`[STARTUP] Setting URLs from Render: ${process.env.RENDER_EXTERNAL_URL}`);
+  console.log(`[PRODUCTION DEBUG] Setting URLs from Render: ${process.env.RENDER_EXTERNAL_URL}`);
+  console.log('[PRODUCTION DEBUG] Updated SERVER_URL:', process.env.SERVER_URL);
+  console.log('[PRODUCTION DEBUG] Updated CLIENT_URL:', process.env.CLIENT_URL);
 }
 
 const express = require('express');
@@ -48,9 +56,12 @@ app.use(express.json());
 const corsOptions = {
   // Allow multiple origins (both production and development)
   origin: function(origin, callback) {
-    if (IS_PRODUCTION && !origin) {
-      // In production, only allow requests with an origin header
-      return callback(null, false);
+    console.log('[PRODUCTION DEBUG] CORS request from origin:', origin);
+    
+    // In production mode, for debugging let's allow all origins
+    if (IS_PRODUCTION) {
+      console.log('[PRODUCTION DEBUG] Production mode: allowing all origins temporarily for debugging');
+      return callback(null, true);
     }
 
     // Define allowed origins
@@ -65,20 +76,23 @@ const corsOptions = {
       'http://127.0.0.1:5173'
     ];
     
-    // Always allow the Render.com domain in production
-    if (IS_PRODUCTION && origin && origin.includes('onrender.com')) {
-      return callback(null, true);
-    }
+    console.log('[PRODUCTION DEBUG] Allowed origins:', allowedOrigins);
     
     // Allow requests with no origin in development (like mobile apps or curl requests)
-    if (!IS_PRODUCTION && !origin) {
+    if (!origin) {
+      console.log('[PRODUCTION DEBUG] No origin provided, allowing request');
       return callback(null, true);
     }
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('onrender.com')) {
+      console.log('[PRODUCTION DEBUG] Origin matched or is Render domain, allowing request');
       callback(null, true);
     } else {
-      callback(null, false);
+      console.log('[PRODUCTION DEBUG] Origin not in allowed list', origin);
+      // For debugging purposes, we'll allow all origins temporarily
+      callback(null, true);
+      // When debugging is complete, uncomment this and comment the line above:
+      // callback(null, false);
     }
   },
   credentials: true,
@@ -167,41 +181,65 @@ app.get('/api-info', (req, res) => {
 // Database initialization
 async function initializeDatabase() {
   try {
+    console.log('[PRODUCTION DEBUG] Initializing database...');
+    
+    const dbPath = path.join(__dirname, 'data/joshua_center.db');
+    console.log('[PRODUCTION DEBUG] Database path:', dbPath);
+    console.log('[PRODUCTION DEBUG] Database exists:', fsSync.existsSync(dbPath));
+    
+    if (fsSync.existsSync(dbPath)) {
+      const stats = fsSync.statSync(dbPath);
+      console.log('[PRODUCTION DEBUG] Database file size:', stats.size, 'bytes');
+      console.log('[PRODUCTION DEBUG] Database last modified:', stats.mtime);
+    }
+    
     // Read and execute the SQL schema
     const sql = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
+    console.log('[PRODUCTION DEBUG] SQL file read, length:', sql.length);
+    
     db.exec(sql, (err) => {
       if (err) {
-        console.error('Database initialization error:', err);
+        console.error('[PRODUCTION DEBUG] Database initialization error:', err);
       } else {
-        console.log('Database initialized');
+        console.log('[PRODUCTION DEBUG] Database initialized successfully');
         
-        // Check if we need to populate with mock data (only in development)
-        if (!IS_PRODUCTION) {
-          db.get('SELECT COUNT(*) as count FROM Applicant', (err, result) => {
+        // Check applicant count in all environments for debugging
+        db.get('SELECT COUNT(*) as count FROM Applicant', (err, result) => {
+          if (err) {
+            console.error('[PRODUCTION DEBUG] Error checking applicant count:', err);
+            return;
+          }
+          
+          console.log(`[PRODUCTION DEBUG] Database contains ${result.count} applicants`);
+          
+          // For debugging in production too, print the first few applicants
+          db.all('SELECT id, name, email FROM Applicant LIMIT 3', (err, rows) => {
             if (err) {
-              console.error('Error checking applicant count:', err);
+              console.error('[PRODUCTION DEBUG] Error fetching sample applicants:', err);
               return;
             }
             
-            // If there are no applicants, generate mock data
-            if (result.count === 0) {
-              console.log('No applicants found in database, generating mock data...');
-              
-              // Import and run the mock data generator
-              try {
-                require('./models/mock_data');
-              } catch (err) {
-                console.error('Error generating mock data:', err);
-              }
-            } else {
-              console.log(`Database already contains ${result.count} applicants`);
-            }
+            console.log('[PRODUCTION DEBUG] Sample applicants:', rows);
           });
-        }
+          
+          // If there are no applicants, generate mock data
+          if (result.count === 0) {
+            console.log('[PRODUCTION DEBUG] No applicants found in database, generating mock data...');
+            
+            // Import and run the mock data generator 
+            // We'll now do this in any environment if the DB is empty
+            try {
+              console.log('[PRODUCTION DEBUG] Running mock data generator...');
+              require('./models/mock_data');
+            } catch (err) {
+              console.error('[PRODUCTION DEBUG] Error generating mock data:', err);
+            }
+          } 
+        });
       }
     });
   } catch (err) {
-    console.error('Failed to read SQL file:', err);
+    console.error('[PRODUCTION DEBUG] Failed to read SQL file:', err);
   }
 }
 
