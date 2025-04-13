@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const db = require('./models/db');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -13,6 +14,23 @@ const { passport, session } = require('./middleware/auth');
 
 const app = express();
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+// Ensure required directories exist
+function ensureDirectoriesExist() {
+  const directories = [
+    path.join(__dirname, 'data'),
+    path.join(__dirname, '../uploads')
+  ];
+  
+  directories.forEach(dir => {
+    if (!fsSync.existsSync(dir)) {
+      fsSync.mkdirSync(dir, { recursive: true });
+      console.log(`Created directory: ${dir}`);
+    }
+  });
+}
+
+ensureDirectoriesExist();
 
 // Trust proxy - needed for secure cookies behind a proxy/load balancer
 app.set('trust proxy', 1);
@@ -73,8 +91,9 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
-// Uploads folder is available publically
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Uploads folder is available publicly
+const uploadsDir = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsDir));
 
 // In production, serve static files from the built frontend
 if (IS_PRODUCTION) {
@@ -82,7 +101,7 @@ if (IS_PRODUCTION) {
   const frontendBuildPath = path.join(__dirname, '../src/dist');
   
   try {
-    if (fs.existsSync(frontendBuildPath)) {
+    if (fsSync.existsSync(frontendBuildPath)) {
       console.log(`Serving static files from: ${frontendBuildPath}`);
       
       // Serve static files from the React build
