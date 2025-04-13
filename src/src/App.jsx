@@ -1,5 +1,4 @@
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import PrivateRoute from '../components/PrivateRoute';
 import './App.css';
 
 // Form pages
@@ -13,7 +12,6 @@ import FormStep7 from '../pages/FormStep7';
 import FormStep8 from '../pages/FormStep8';
 import FormSubmit from '../pages/FormSubmit';
 import ThankYouPage from '../pages/ThankYouPage';
-import LoginPage from '../pages/LoginPage';
 
 // Admin pages
 import ApplicantList from '../pages/admin/ApplicantList';
@@ -31,7 +29,6 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Navigate to="/form/step1" replace />} />
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/thank-you" element={<ThankYouPage />} />
           
           {/* Form steps */}
@@ -45,39 +42,11 @@ function App() {
           <Route path="/form/step8" element={<FormStep8 />} />
           <Route path="/form/submit" element={<FormSubmit />} />
           
-          {/* Protected admin routes */}
-          <Route 
-            path="/admin/applicants" 
-            element={
-              <PrivateRoute>
-                <ApplicantList />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/admin/applicants/:id" 
-            element={
-              <PrivateRoute>
-                <ApplicantDetail />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/admin/users" 
-            element={
-              <PrivateRoute>
-                <UserManagement />
-              </PrivateRoute>
-            } 
-          />
-          <Route 
-            path="/admin/locations" 
-            element={
-              <PrivateRoute>
-                <LocationManagement />
-              </PrivateRoute>
-            } 
-          />
+          {/* Admin routes (no longer protected) */}
+          <Route path="/admin/applicants" element={<ApplicantList />} />
+          <Route path="/admin/applicants/:id" element={<ApplicantDetail />} />
+          <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/locations" element={<LocationManagement />} />
           
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />

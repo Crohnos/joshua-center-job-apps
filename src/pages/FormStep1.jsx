@@ -139,18 +139,11 @@ function FormStep1() {
   
   // Check if the verification code is from the URL params
   useEffect(() => {
-    // Check if we need to restore from session or params
     const params = new URLSearchParams(window.location.search);
     const emailParam = params.get('email');
     
     if (emailParam) {
       setEmail(emailParam);
-      // This is just for development - in prod we wouldn't auto-submit
-      setTimeout(() => {
-        document.getElementById('email-form')?.dispatchEvent(
-          new Event('submit', { cancelable: true, bubbles: true })
-        );
-      }, 0);
     }
   }, []);
 
@@ -218,9 +211,6 @@ function FormStep1() {
                 </a>
               </div>
               
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <a href="/#/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
-              </div>
             </div>
           </div>
         ) : step === 'email' ? (
@@ -294,9 +284,6 @@ function FormStep1() {
                 </div>
               </div>
               
-              <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                <a href="/#/login" style={{ fontSize: '0.8rem', color: '#666' }}>Admin Login</a>
-              </div>
             </div>
           </div>
         ) : step === 'verification' && (

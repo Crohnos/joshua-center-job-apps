@@ -1,5 +1,4 @@
 const express = require('express');
-const { isAdmin } = require('../middleware/auth');
 const { 
   submitApplicant, 
   getApplicants, 
@@ -17,9 +16,9 @@ const router = express.Router();
 
 // Applicant routes
 router.post('/applicants', submitApplicant);
-router.get('/applicants', isAdmin, getApplicants);
-router.get('/applicants/:id', isAdmin, getApplicant);
-router.put('/applicants/:id', isAdmin, updateApplicant);
+router.get('/applicants', getApplicants);
+router.get('/applicants/:id', getApplicant);
+router.put('/applicants/:id', updateApplicant);
 router.get('/check-email/:email', checkEmailExists);
 
 // Email verification routes
@@ -27,15 +26,15 @@ router.post('/verify-email', sendVerificationCode);
 router.post('/verify-code', verifyCode);
 
 // User routes
-router.get('/users', isAdmin, getUsers);
-router.post('/users', isAdmin, addUser);
-router.put('/users/:id', isAdmin, updateUser);
-router.delete('/users/:id', isAdmin, deleteUser);
+router.get('/users', getUsers);
+router.post('/users', addUser);
+router.put('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 
 // Location routes
 router.get('/locations', getLocations);
-router.post('/locations', isAdmin, addLocation);
-router.put('/locations/:id', isAdmin, updateLocation);
-router.delete('/locations/:id', isAdmin, deleteLocation);
+router.post('/locations', addLocation);
+router.put('/locations/:id', updateLocation);
+router.delete('/locations/:id', deleteLocation);
 
 module.exports = router;

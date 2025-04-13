@@ -17,9 +17,7 @@ const fsSync = require('fs');
 const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
-const { passport, session } = require('./middleware/auth');
 
 const app = express();
 
@@ -93,12 +91,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(session);
-app.use(passport.initialize());
-app.use(passport.session());
 
 // API routes
-app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
 // Uploads folder is available publicly

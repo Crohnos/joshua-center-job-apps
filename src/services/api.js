@@ -4,7 +4,6 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const api = axios.create({
   baseURL: apiUrl,
-  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -24,12 +23,7 @@ const handleApiError = (error, defaultReturn = null) => {
     console.error('API Error:', errorDetails);
   }
   
-  // For authentication errors, throw the error to be handled by components
-  if (error.response?.status === 401 || error.response?.status === 403) {
-    throw error;
-  }
-  
-  // For other errors, return default value if provided
+  // Return default value if provided
   if (defaultReturn !== undefined) {
     return defaultReturn;
   }
@@ -68,14 +62,6 @@ export const getLocations = async () => {
   }
 };
 
-export const checkAuth = async () => {
-  try {
-    const response = await api.get('/auth/check-auth');
-    return response.data;
-  } catch (error) {
-    return handleApiError(error, { authenticated: false });
-  }
-};
 
 // Email verification for form access
 export const sendVerificationCode = async (email) => {

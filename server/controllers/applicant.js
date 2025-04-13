@@ -128,7 +128,7 @@ function submitApplicant(req, res) {
 }
 
 function getApplicants(req, res) {
-  console.log('getApplicants called, authenticated user:', req.user?.email);
+  console.log('getApplicants called');
   
   // Use the same database connection for consistency
   const query = `
@@ -342,8 +342,12 @@ function verifyCode(req, res) {
   // Code is valid, clean up and create session
   verificationCodes.delete(email);
   
-  // Create a session for the verified email
-  req.session.verifiedEmail = email;
+  // Store verification status (no longer using sessions)
+  // This would be better stored in the database in a real application
+  verificationCodes.set(`verified_${email}`, { 
+    verified: true,
+    timestamp: Date.now()
+  });
   
   // Return success with verified email
   res.json({ 
