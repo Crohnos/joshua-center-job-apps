@@ -1,6 +1,15 @@
 // Load environment variables
 require('dotenv').config();
 
+// Set critical environment variables early
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+if (IS_PRODUCTION && process.env.RENDER_EXTERNAL_URL) {
+  // When running on Render.com, use the provided external URL
+  process.env.SERVER_URL = process.env.RENDER_EXTERNAL_URL;
+  process.env.CLIENT_URL = process.env.RENDER_EXTERNAL_URL;
+  console.log(`[STARTUP] Setting URLs from Render: ${process.env.RENDER_EXTERNAL_URL}`);
+}
+
 const express = require('express');
 const db = require('./models/db');
 const fs = require('fs').promises;
@@ -13,7 +22,6 @@ const apiRoutes = require('./routes/api');
 const { passport, session } = require('./middleware/auth');
 
 const app = express();
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Ensure required directories exist
 function ensureDirectoriesExist() {
@@ -214,16 +222,10 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
-  // Get the public URL if on Render.com
+  // Get the public URL
   const host = process.env.RENDER_EXTERNAL_URL || 
                process.env.SERVER_URL || 
                `http://localhost:${PORT}`;
-  
-  // If SERVER_URL isn't set but we're on Render, use the Render URL
-  if (IS_PRODUCTION && !process.env.SERVER_URL && process.env.RENDER_EXTERNAL_URL) {
-    process.env.SERVER_URL = process.env.RENDER_EXTERNAL_URL;
-    process.env.CLIENT_URL = process.env.RENDER_EXTERNAL_URL;
-  }
   
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${IS_PRODUCTION ? 'production' : 'development'}`);

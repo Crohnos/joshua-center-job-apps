@@ -38,10 +38,17 @@ const passportSetup = () => {
   } else {
     // Use the real Google strategy
     const GoogleStrategy = require('passport-google-oauth20').Strategy;
+    // For production on Render.com, use the Render external URL if available
+    const callbackURL = process.env.RENDER_EXTERNAL_URL 
+      ? `${process.env.RENDER_EXTERNAL_URL}/auth/google/callback`
+      : `${SERVER_URL}/auth/google/callback`;
+      
+    console.log(`Google OAuth callback URL: ${callbackURL}`);
+    
     passport.use(new GoogleStrategy({
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: `${SERVER_URL}/auth/google/callback`,
+      callbackURL: callbackURL,
       proxy: true
     }, async (accessToken, refreshToken, profile, done) => {
       try {
