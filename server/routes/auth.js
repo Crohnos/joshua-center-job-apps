@@ -33,18 +33,27 @@ router.get('/google/callback',
     // If authentication failed with a message, redirect to login with error
     if (req.session.messages && req.session.messages.length) {
       const errorMsg = encodeURIComponent(req.session.messages[req.session.messages.length-1]);
-      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/?error=${errorMsg}`);
+      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=${errorMsg}`);
     }
     
     // For form authentication, add email to query params
     if (req.session.redirectTo && req.session.redirectTo.startsWith('/form')) {
-      const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${req.session.redirectTo}?email=${encodeURIComponent(req.user.email)}`;
+      // Check if redirectTo already has hash format
+      const redirectPath = req.session.redirectTo.includes('/#/') 
+        ? req.session.redirectTo 
+        : `/#${req.session.redirectTo}`;
+      
+      const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}?email=${encodeURIComponent(req.user.email)}`;
       console.log(`Redirecting to: ${redirectUrl}`);
       return res.redirect(redirectUrl);
     }
     
-    // For admin routes, redirect to client URL + admin route
-    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${req.session.redirectTo || '/admin/applicants'}`;
+    // For admin routes, redirect to client URL + admin route with hash format
+    const redirectPath = (req.session.redirectTo || '/admin/applicants').includes('/#/') 
+      ? (req.session.redirectTo || '/admin/applicants')
+      : `/#${req.session.redirectTo || '/admin/applicants'}`;
+      
+    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
     console.log(`Redirecting to: ${redirectUrl}`);
     res.redirect(redirectUrl);
     delete req.session.redirectTo;
@@ -53,8 +62,8 @@ router.get('/google/callback',
 router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) return res.status(500).send('Error logging out');
-    // Redirect to the client login page instead of server root
-    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/`);
+    // Redirect to the client login page instead of server root - use hash format
+    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/#/`);
   });
 });
 
