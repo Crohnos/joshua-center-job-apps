@@ -69,13 +69,8 @@ export const checkEmailExists = async (email) => {
 export const getApplicants = async () => {
   try {
     console.log('Fetching applicants...');
-    const response = await api.get('/api/applicants', {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
+    // Use the default api instance which already has withCredentials set
+    const response = await api.get('/api/applicants');
     console.log('Applicants response:', response.data);
     return response.data;
   } catch (error) {
@@ -97,13 +92,8 @@ export const updateApplicant = async (id, data) => {
 export const getUsers = async () => {
   try {
     console.log('Fetching users...');
-    const response = await api.get('/api/users', {
-      withCredentials: true, 
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
+    // Use the default api instance which already has withCredentials set
+    const response = await api.get('/api/users');
     console.log('Users response:', response.data);
     return response.data;
   } catch (error) {
