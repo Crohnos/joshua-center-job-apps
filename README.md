@@ -12,7 +12,7 @@ A full-stack web application for The Joshua Center to manage job applications.
 ## Tech Stack
 
 ### Frontend
-- React
+- React 19
 - React Router
 - Zustand (state management)
 - React Hook Form
@@ -27,7 +27,7 @@ A full-stack web application for The Joshua Center to manage job applications.
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v16+)
+- Node.js (v18+)
 - npm
 
 ### Setup
@@ -40,9 +40,7 @@ cd job-app-tracker
 
 2. Install dependencies
 ```
-npm install
-cd src && npm install
-cd ../server && npm install
+npm run install:all
 ```
 
 3. Set up Environment Variables
@@ -59,6 +57,32 @@ npm run dev
 ```
 
 This will start both the backend server (port 3001) and frontend development server (port 5173).
+
+## Deployment to Render.com
+
+### Setup Instructions
+
+1. Create a Web Service on Render.com
+2. Connect to your GitHub repository
+3. Use the following settings:
+   - **Name**: joshua-center-job-apps
+   - **Environment**: Node
+   - **Build Command**: `npm run install:all && npm run build`
+   - **Start Command**: `npm start`
+   - **Health Check Path**: `/health`
+
+4. Add the following environment variables:
+   - `NODE_ENV`: production
+   - `SESSION_SECRET`: [your secret]
+   - `GOOGLE_CLIENT_ID`: [your Google client ID]
+   - `GOOGLE_CLIENT_SECRET`: [your Google client secret]
+   - `CLIENT_URL`: [your frontend URL - same as this service]
+   - `SERVER_URL`: [your backend URL - same as this service]
+
+The application is designed to:
+1. Build the frontend static files
+2. Serve those static files from the backend
+3. Use the same domain for both API and frontend to avoid CORS issues
 
 ## Project Structure
 

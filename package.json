@@ -2,8 +2,11 @@
   "name": "job-app-tracker",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
+    "build": "cd src && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../src && npm install",
     "start:server": "cd server && npm run start",
     "dev:server": "cd server && npm run dev",
     "start:client": "cd src && npm run dev",
@@ -16,5 +19,8 @@
   "type": "commonjs",
   "dependencies": {
     "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
