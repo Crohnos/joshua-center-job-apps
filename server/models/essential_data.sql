@@ -1,4 +1,5 @@
 -- Essential data - minimal set of sample applicants for production use
+-- Note: also check additional_data.sql for more sample applicants (30+ more records)
 
 -- Basic applicant entries - no references or other relations
 INSERT OR IGNORE INTO Applicant (

@@ -160,16 +160,30 @@ async function initializeDatabase() {
           console.log('Adding sample data...');
           try {
             // Load and execute essential data SQL
-            const sampleData = await fs.readFile(path.join(__dirname, 'models/essential_data.sql'), 'utf8');
-            db.exec(sampleData, (err) => {
+            const essentialData = await fs.readFile(path.join(__dirname, 'models/essential_data.sql'), 'utf8');
+            db.exec(essentialData, async (err) => {
               if (err) {
-                console.error('Error adding sample data:', err);
+                console.error('Error adding essential sample data:', err);
               } else {
-                console.log('Sample data added successfully');
+                console.log('Essential sample data added successfully');
+                
+                // Also add additional sample data
+                try {
+                  const additionalData = await fs.readFile(path.join(__dirname, 'models/additional_data.sql'), 'utf8');
+                  db.exec(additionalData, (err) => {
+                    if (err) {
+                      console.error('Error adding additional sample data:', err);
+                    } else {
+                      console.log('Additional sample data added successfully');
+                    }
+                  });
+                } catch (err) {
+                  console.error('Error reading additional data file:', err);
+                }
               }
             });
           } catch (err) {
-            console.error('Error reading sample data file:', err);
+            console.error('Error reading essential data file:', err);
           }
         } else {
           console.log(`Database already contains ${result.count} applicants`);
