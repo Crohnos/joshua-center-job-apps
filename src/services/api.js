@@ -27,9 +27,12 @@ export const getLocations = async () => {
 
 export const checkAuth = async () => {
   try {
+    console.log('Checking authentication...');
     const response = await api.get('/auth/check-auth');
+    console.log('Auth response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Auth check error:', error.response?.data || error.message);
     return { authenticated: false };
   }
 };

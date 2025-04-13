@@ -3,7 +3,18 @@ const { passport } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/google', (req, res, next) => {
+  console.log('=== AUTH DEBUG ===');
   console.log('Auth route hit: /google');
+  console.log('req.session:', req.session);
+  console.log('Session ID:', req.sessionID);
+  console.log('Environment variables:', {
+    NODE_ENV: process.env.NODE_ENV,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ? 'Set' : 'Not set',
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ? 'Set' : 'Not set',
+    SESSION_SECRET: process.env.SESSION_SECRET ? 'Set' : 'Not set',
+    CLIENT_URL: process.env.CLIENT_URL,
+    SERVER_URL: process.env.SERVER_URL
+  });
   
   // Store redirect URL in session if provided
   if (req.query.redirectTo) {
@@ -11,29 +22,52 @@ router.get('/google', (req, res, next) => {
     req.session.redirectTo = req.query.redirectTo;
   }
   
-  passport.authenticate('google', { 
+  const authOptions = { 
     scope: ['profile', 'email'],
     // Add dummy email to query for development mode
     ...(process.env.NODE_ENV !== 'production' && !process.env.GOOGLE_CLIENT_ID && { 
       state: JSON.stringify({ email: 'dev@example.com', name: 'Dev User' })
     })
-  })(req, res, next);
+  };
+  
+  console.log('Auth options:', authOptions);
+  console.log('=== END AUTH DEBUG ===');
+  
+  passport.authenticate('google', authOptions)(req, res, next);
 });
 
 router.get('/google/callback', 
+  (req, res, next) => {
+    console.log('=== CALLBACK DEBUG - Before Authentication ===');
+    console.log('Callback route hit: /google/callback');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session exists:', !!req.session);
+    console.log('Session data:', req.session);
+    console.log('Request query params:', req.query);
+    console.log('Request cookies:', req.headers.cookie);
+    console.log('=== END CALLBACK DEBUG - Before Authentication ===');
+    next();
+  },
   passport.authenticate('google', { 
     failureRedirect: '/',
     failureMessage: true 
   }), 
   (req, res) => {
-    console.log('Auth callback hit: /google/callback');
-    console.log('User:', req.user);
-    console.log('RedirectTo:', req.session.redirectTo);
+    console.log('=== CALLBACK DEBUG - After Authentication ===');
+    console.log('Auth callback completed successfully');
+    console.log('Session ID:', req.sessionID);
+    console.log('Session data after auth:', req.session);
+    console.log('User authenticated:', !!req.user);
+    console.log('User details:', req.user);
+    console.log('RedirectTo from session:', req.session.redirectTo);
+    console.log('Messages:', req.session.messages);
     
     // If authentication failed with a message, redirect to login with error
     if (req.session.messages && req.session.messages.length) {
       const errorMsg = encodeURIComponent(req.session.messages[req.session.messages.length-1]);
-      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=${errorMsg}`);
+      const errorUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/#/?error=${errorMsg}`;
+      console.log(`Auth failed with message. Redirecting to: ${errorUrl}`);
+      return res.redirect(errorUrl);
     }
     
     // For form authentication, add email to query params
@@ -44,7 +78,7 @@ router.get('/google/callback',
         : `/#${req.session.redirectTo}`;
       
       const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}?email=${encodeURIComponent(req.user.email)}`;
-      console.log(`Redirecting to: ${redirectUrl}`);
+      console.log(`Form auth. Redirecting to: ${redirectUrl}`);
       return res.redirect(redirectUrl);
     }
     
@@ -54,7 +88,9 @@ router.get('/google/callback',
       : `/#${req.session.redirectTo || '/admin/applicants'}`;
       
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
-    console.log(`Redirecting to: ${redirectUrl}`);
+    console.log(`Admin auth. Redirecting to: ${redirectUrl}`);
+    console.log('=== END CALLBACK DEBUG - After Authentication ===');
+    
     res.redirect(redirectUrl);
     delete req.session.redirectTo;
   });
