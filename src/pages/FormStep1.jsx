@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
 import useFormStore from '../store/formStore';
 import { sendVerificationCode, verifyCode, checkEmailExists } from '../services/api';
@@ -191,8 +191,8 @@ function FormStep1() {
               <p>If you need to update your application or have questions, please contact our HR department at <a href="mailto:hr@thejoshuacenter.com">hr@thejoshuacenter.com</a>.</p>
               
               <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-                <a 
-                  href="/" 
+                <Link 
+                  to="/form/step1" 
                   className="button primary"
                   style={{ 
                     display: 'inline-flex', 

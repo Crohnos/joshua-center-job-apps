@@ -57,7 +57,7 @@ function ThankYouPage() {
             </p>
             
             <Link 
-              to="/" 
+              to="/form/step1" 
               className="button primary"
               style={{ 
                 display: 'inline-flex', 
