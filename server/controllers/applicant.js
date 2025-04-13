@@ -130,64 +130,38 @@ function submitApplicant(req, res) {
 function getApplicants(req, res) {
   console.log('getApplicants called, authenticated user:', req.user?.email);
   
-  // Debug the exact database file being used
-  db.get("PRAGMA database_list", (err, result) => {
+  // Use the same database connection for consistency
+  const query = `
+    SELECT a.id, a.email, a.name, a.application_status, a.assigned_employee_id,
+           u.first_name || ' ' || u.last_name as assigned_to
+    FROM Applicant a
+    LEFT JOIN User u ON a.assigned_employee_id = u.id
+    ORDER BY a.id DESC
+  `;
+  
+  db.all(query, (err, rows) => {
     if (err) {
-      console.error("Error getting database info:", err);
-    } else {
-      console.log("Database file being used:", result);
-      
-      // Try a direct approach with the database we know contains data
-      const sqlite3 = require('sqlite3').verbose();
-      const path = require('path');
-      const directDbPath = path.join(__dirname, '../joshua_center.db');
-      console.log(`Directly connecting to DB at: ${directDbPath}`);
-      
-      const directDb = new sqlite3.Database(directDbPath, sqlite3.OPEN_READONLY, (err) => {
-        if (err) {
-          console.error('Direct database connection error:', err);
-          return;
-        }
-        
-        console.log('Connected directly to SQLite database');
-        
-        const query = `
-          SELECT a.id, a.email, a.name, a.application_status, a.assigned_employee_id,
-                 u.first_name || ' ' || u.last_name as assigned_to
-          FROM Applicant a
-          LEFT JOIN User u ON a.assigned_employee_id = u.id
-          ORDER BY a.id DESC
-        `;
-        
-        directDb.all(query, (err, rows) => {
-          if (err) {
-            console.error('Error fetching applicants directly:', err);
-            return;
-          }
-          
-          console.log(`Directly found ${rows.length} applicants in database`);
-          
-          // Close the direct connection
-          directDb.close();
-          
-          // Check for null values that might cause issues
-          const sanitizedRows = rows.map(row => {
-            // Replace any null values with appropriate defaults
-            return {
-              id: row.id,
-              email: row.email || '',
-              name: row.name || '',
-              application_status: row.application_status || 'not viewed',
-              assigned_employee_id: row.assigned_employee_id || null,
-              assigned_to: row.assigned_to || null
-            };
-          });
-          
-          res.setHeader('Cache-Control', 'no-store');
-          res.json(sanitizedRows);
-        });
-      });
+      console.error('Error fetching applicants:', err);
+      return res.status(500).json({ error: `Error fetching applicants: ${err.message}` });
     }
+    
+    console.log(`Found ${rows.length} applicants in database`);
+    
+    // Check for null values that might cause issues
+    const sanitizedRows = rows.map(row => {
+      // Replace any null values with appropriate defaults
+      return {
+        id: row.id,
+        email: row.email || '',
+        name: row.name || '',
+        application_status: row.application_status || 'not viewed',
+        assigned_employee_id: row.assigned_employee_id || null,
+        assigned_to: row.assigned_to || null
+      };
+    });
+    
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(sanitizedRows);
   });
 }
 
@@ -195,77 +169,56 @@ function getApplicant(req, res) {
   const id = req.params.id;
   console.log(`Getting details for applicant ID: ${id}`);
   
-  // Use the same direct database connection approach that works for the list
-  const sqlite3 = require('sqlite3').verbose();
-  const path = require('path');
-  const directDbPath = path.join(__dirname, '../joshua_center.db');
-  console.log(`Directly connecting to DB at: ${directDbPath}`);
-  
-  const directDb = new sqlite3.Database(directDbPath, sqlite3.OPEN_READONLY, (err) => {
+  // Use the established database connection
+  db.get('SELECT * FROM Applicant WHERE id = ?', [id], (err, applicant) => {
     if (err) {
-      console.error('Direct database connection error:', err);
-      return res.status(500).send(`Database connection error: ${err.message}`);
+      console.error('Error fetching applicant:', err);
+      return res.status(500).send(`Error fetching applicant: ${err.message}`);
     }
     
-    console.log('Connected directly to SQLite database for applicant details');
+    if (!applicant) {
+      return res.status(404).send('Applicant not found');
+    }
     
-    directDb.get('SELECT * FROM Applicant WHERE id = ?', [id], (err, applicant) => {
-      if (err) {
-        console.error('Error fetching applicant:', err);
-        directDb.close();
-        return res.status(500).send(`Error fetching applicant: ${err.message}`);
+    console.log(`Found applicant: ${applicant.name}`);
+    
+    // Parse JSON fields
+    try {
+      applicant.populations = JSON.parse(applicant.populations);
+    } catch (e) {
+      applicant.populations = [];
+    }
+    
+    // Get references
+    db.all('SELECT * FROM Reference WHERE applicant_id = ?', [id], (refErr, refs) => {
+      if (refErr) {
+        console.error('Error fetching references:', refErr);
+        return res.status(500).send(`Error fetching references: ${refErr.message}`);
       }
       
-      if (!applicant) {
-        directDb.close();
-        return res.status(404).send('Applicant not found');
-      }
+      console.log(`Found ${refs.length} references`);
       
-      console.log(`Found applicant: ${applicant.name}`);
-      
-      // Parse JSON fields
-      try {
-        applicant.populations = JSON.parse(applicant.populations);
-      } catch (e) {
-        applicant.populations = [];
-      }
-      
-      // Get references
-      directDb.all('SELECT * FROM Reference WHERE applicant_id = ?', [id], (refErr, refs) => {
-        if (refErr) {
-          console.error('Error fetching references:', refErr);
-          directDb.close();
-          return res.status(500).send(`Error fetching references: ${refErr.message}`);
-        }
-        
-        console.log(`Found ${refs.length} references`);
-        
-        // Get locations
-        directDb.all(
-          `SELECT l.* FROM AppliedLoc al 
-           JOIN Location l ON al.location_id = l.id 
-           WHERE al.applicant_id = ?`, 
-          [id], 
-          (locErr, locs) => {
-            if (locErr) {
-              console.error('Error fetching locations:', locErr);
-              directDb.close();
-              return res.status(500).send(`Error fetching locations: ${locErr.message}`);
-            }
-            
-            console.log(`Found ${locs.length} applied locations`);
-            
-            // Combine all data
-            applicant.references = refs;
-            applicant.locations = locs;
-            
-            // Close the connection
-            directDb.close();
-            
-            res.json(applicant);
+      // Get locations
+      db.all(
+        `SELECT l.* FROM AppliedLoc al 
+         JOIN Location l ON al.location_id = l.id 
+         WHERE al.applicant_id = ?`, 
+        [id], 
+        (locErr, locs) => {
+          if (locErr) {
+            console.error('Error fetching locations:', locErr);
+            return res.status(500).send(`Error fetching locations: ${locErr.message}`);
           }
-        );
-      });
+          
+          console.log(`Found ${locs.length} applied locations`);
+          
+          // Combine all data
+          applicant.references = refs;
+          applicant.locations = locs;
+          
+          res.json(applicant);
+        }
+      );
     });
   });
 }

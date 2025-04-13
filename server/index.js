@@ -69,10 +69,36 @@ app.get('/', (req, res) => {
 // Database initialization
 async function initializeDatabase() {
   try {
+    // Read and execute the SQL schema
     const sql = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
     db.exec(sql, (err) => {
-      if (err) console.error('Database initialization error:', err);
-      else console.log('Database initialized');
+      if (err) {
+        console.error('Database initialization error:', err);
+      } else {
+        console.log('Database initialized');
+        
+        // Check if we need to populate with mock data
+        db.get('SELECT COUNT(*) as count FROM Applicant', (err, result) => {
+          if (err) {
+            console.error('Error checking applicant count:', err);
+            return;
+          }
+          
+          // If there are no applicants, generate mock data
+          if (result.count === 0) {
+            console.log('No applicants found in database, generating mock data...');
+            
+            // Import and run the mock data generator
+            try {
+              require('./models/mock_data');
+            } catch (err) {
+              console.error('Error generating mock data:', err);
+            }
+          } else {
+            console.log(`Database already contains ${result.count} applicants`);
+          }
+        });
+      }
     });
   } catch (err) {
     console.error('Failed to read SQL file:', err);

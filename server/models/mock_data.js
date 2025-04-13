@@ -195,7 +195,8 @@ Additional Training: ${getRandomItem(['EMDR', 'Play Therapy', 'CBT', 'DBT', 'Tra
     const ethnicity = getRandomItem(ethnicities);
     
     // Create a mock resume path - we're not actually creating files
-    const resumePath = `/uploads/${Date.now()}-${getRandomInt(100000000, 999999999)}.pdf`;
+    // Make the path relative since the uploads folder is at the server level
+    const resumePath = `${Date.now()}-${getRandomInt(100000000, 999999999)}.pdf`;
     
     // Get random status, weighted toward 'not viewed'
     let status;
