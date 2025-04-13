@@ -130,10 +130,6 @@ function submitApplicant(req, res) {
 function getApplicants(req, res) {
   console.log('getApplicants called, authenticated user:', req.user?.email);
   
-  // Debug session info 
-  console.log('Session in getApplicants:', req.session);
-  console.log('IsAuthenticated in getApplicants:', req.isAuthenticated());
-  
   const query = `
     SELECT a.id, a.email, a.name, a.application_status, a.assigned_employee_id,
            u.first_name || ' ' || u.last_name as assigned_to
@@ -142,15 +138,13 @@ function getApplicants(req, res) {
     ORDER BY a.id DESC
   `;
   
-  console.log('Executing SQL query:', query);
-  
   db.all(query, (err, rows) => {
     if (err) {
       console.error('Error fetching applicants:', err);
       return res.status(500).json({ error: `Error fetching applicants: ${err.message}` });
     }
     
-    console.log(`Found ${rows.length} applicants in database:`, rows);
+    console.log(`Found ${rows.length} applicants in database`);
     
     // Check for null values that might cause issues
     const sanitizedRows = rows.map(row => {
@@ -165,7 +159,6 @@ function getApplicants(req, res) {
       };
     });
     
-    console.log('Sending sanitized applicant data:', sanitizedRows);
     res.setHeader('Cache-Control', 'no-store');
     res.json(sanitizedRows);
   });
