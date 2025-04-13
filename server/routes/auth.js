@@ -62,13 +62,22 @@ router.get('/google/callback',
       return res.redirect(redirectUrl);
     }
     
-    // For admin routes, redirect to client URL + admin route with hash format
-    const redirectPath = (req.session.redirectTo || '/admin/applicants').includes('/#/') 
-      ? (req.session.redirectTo || '/admin/applicants')
-      : `/#${req.session.redirectTo || '/admin/applicants'}`;
+    // For admin routes, always redirect to admin dashboard
+    // Only use redirectTo if it contains /admin/, otherwise force admin/applicants
+    let targetPath = '/admin/applicants';
+    if (req.session.redirectTo && req.session.redirectTo.includes('/admin/')) {
+      targetPath = req.session.redirectTo;
+    }
+    
+    // Ensure proper hash format
+    const redirectPath = targetPath.includes('/#/') 
+      ? targetPath
+      : `/#${targetPath}`;
       
     // Use absolute URL for redirection 
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}${redirectPath}`;
+    
+    console.log(`Admin redirect path: ${redirectPath}`);
     
     console.log(`Redirecting after auth to: ${redirectUrl}`);
     res.redirect(redirectUrl);

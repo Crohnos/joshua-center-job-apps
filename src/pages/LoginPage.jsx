@@ -36,7 +36,11 @@ function LoginPage() {
   // Redirect to auth with return URL as query parameter
   const handleLogin = () => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    const redirectPath = from.startsWith('/') ? `/#${from}` : `/#/${from}`;
+    
+    // Always force admin redirect path for admin login
+    const redirectPath = '/#/admin/applicants';
+    
+    console.log(`Login redirectPath: ${redirectPath}`);
     window.location.href = `${apiUrl}/auth/google?redirectTo=${encodeURIComponent(redirectPath)}`;
   };
 
