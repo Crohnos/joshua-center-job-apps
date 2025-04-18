@@ -409,15 +409,17 @@ function ApplicantList() {
             padding: var(--space-4) var(--space-4);
             font-weight: 600;
             text-align: left;
-            color: var(--gray-700);
-            background-color: var(--gray-50);
-            border-bottom: 2px solid var(--gray-200);
+            color: var(--gray-100);
+            background-color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-600);
           }
           
           .data-table td {
             padding: var(--space-4) var(--space-4);
-            border-bottom: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-600);
             vertical-align: middle;
+            color: var(--gray-300);
+            background-color: var(--gray-800);
           }
           
           /* Column widths */
@@ -495,12 +497,18 @@ function ApplicantList() {
             max-width: 220px;
             padding: var(--space-2);
             border-radius: var(--radius-md);
-            border: 1px solid var(--gray-300);
-            background-color: white;
+            border: 1px solid var(--gray-600);
+            background-color: var(--gray-800);
+            color: var(--gray-100);
             box-sizing: border-box;
             margin: 0 auto;
             display: block;
             font-size: 0.9rem;
+          }
+          
+          .assignment-select option {
+            background-color: var(--gray-800);
+            color: var(--gray-100);
           }
           
           /* Action buttons */
@@ -515,7 +523,7 @@ function ApplicantList() {
             align-items: center;
             gap: var(--space-1);
             padding: var(--space-2) var(--space-3);
-            background-color: var(--primary-focus);
+            background-color: rgba(67, 97, 238, 0.2);
             color: var(--primary);
             border-radius: var(--radius-md);
             font-size: var(--font-size-sm);
@@ -525,11 +533,12 @@ function ApplicantList() {
             text-decoration: none;
             white-space: nowrap;
             box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(67, 97, 238, 0.4);
           }
           
           .view-button:hover {
-            background-color: var(--primary);
-            color: white;
+            background-color: rgba(67, 97, 238, 0.3);
+            color: var(--primary);
           }
           
           /* Media queries for responsive design */
