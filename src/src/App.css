@@ -178,13 +178,56 @@ tbody tr:hover {
 .address-fields {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-6);
-  margin-top: var(--space-6);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+@media (min-width: 480px) {
+  .address-fields {
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  
+  .address-fields .city-field {
+    grid-column: 1 / 2;
+  }
+  
+  .address-fields .state-field {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+  
+  .address-fields .zip-field {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+  }
 }
 
 @media (min-width: 640px) {
   .address-fields {
     grid-template-columns: repeat(3, minmax(0, 1fr)); /* Force equal columns with minmax */
+    column-gap: var(--space-6); /* Gap between columns */
+    row-gap: var(--space-6);
+  }
+  
+  .address-fields .city-field {
+    grid-column: auto;
+  }
+  
+  .address-fields .state-field {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  
+  .address-fields .zip-field {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .address-fields {
     column-gap: var(--space-8); /* Even larger gap between columns */
   }
 }
@@ -195,19 +238,18 @@ tbody tr:hover {
   margin-right: 0;
   position: relative;
   box-sizing: border-box;
+  margin-bottom: var(--space-2);
+}
+
+@media (min-width: 480px) {
+  .address-fields .form-field {
+    margin-bottom: var(--space-4);
+  }
 }
 
 /* Specific styling for each address field */
-.address-fields .city-field input {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.address-fields .state-field select {
-  width: 100%;
-  box-sizing: border-box;
-}
-
+.address-fields .city-field input,
+.address-fields .state-field select,
 .address-fields .zip-field input {
   width: 100%;
   box-sizing: border-box;
@@ -235,7 +277,7 @@ tbody tr:hover {
 /* Info message for form fields */
 .info-message {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-1);
   color: var(--primary);
   font-size: var(--font-size-xs);
@@ -243,13 +285,32 @@ tbody tr:hover {
   font-weight: 500;
   font-style: italic;
   background-color: rgba(67, 97, 238, 0.1);
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem;
   border-radius: var(--radius-md);
+  line-height: 1.4;
+}
+
+@media (min-width: 480px) {
+  .info-message {
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+  }
 }
 
 .info-message svg {
   color: var(--primary);
   flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+}
+
+@media (min-width: 480px) {
+  .info-message svg {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+  }
 }
 
 /* Card hover effects */

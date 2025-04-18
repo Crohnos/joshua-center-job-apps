@@ -48,9 +48,30 @@ function Breadcrumbs() {
       </nav>
       
       {/* Admin Link - Always visible */}
-      <div style={{ textAlign: 'right', padding: '10px 20px', fontSize: '0.8rem' }}>
-        <Link to="/admin/applicants" style={{ color: 'var(--gray-200)', textDecoration: 'underline', fontWeight: 'bold' }}>
-          Admin Dashboard →
+      <div style={{ 
+        textAlign: 'right', 
+        padding: '8px 12px', 
+        fontSize: '0.75rem',
+        marginTop: '8px',
+        marginBottom: '16px' 
+      }}>
+        <Link 
+          to="/admin/applicants" 
+          style={{ 
+            color: 'var(--gray-300)', 
+            textDecoration: 'none', 
+            fontWeight: 'bold',
+            background: 'var(--gray-800)',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            boxShadow: 'var(--shadow-sm)'
+          }}
+        >
+          <span>Admin Dashboard</span>
+          <span style={{ fontSize: '14px' }}>→</span>
         </Link>
       </div>
     </div>
