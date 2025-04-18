@@ -148,10 +148,19 @@ async function initializeDatabase() {
   try {
     console.log('Initializing database...');
     
-    // Read and execute the SQL schema
-    const schema = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
-    
-    db.exec(schema, async (err) => {
+    // Check database tables exist before overwriting schema
+    db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='User'", async (tableErr, tableResult) => {
+      if (tableErr) {
+        console.error('Error checking for existing tables:', tableErr);
+      }
+      
+      // If User table doesn't exist, initialize the database schema
+      if (!tableResult) {
+        console.log('Setting up database schema...');
+        // Read and execute the SQL schema
+        const schema = await fs.readFile(path.join(__dirname, 'models/init.sql'), 'utf8');
+        
+        db.exec(schema, async (err) => {
       if (err) {
         console.error('Database initialization error:', err);
         return;
@@ -178,38 +187,8 @@ async function initializeDatabase() {
               } else {
                 console.log('Essential sample data added successfully');
                 
-                // Also add additional sample data
-                try {
-                  const additionalData = await fs.readFile(path.join(__dirname, 'models/additional_data.sql'), 'utf8');
-                  db.exec(additionalData, async (err) => {
-                    if (err) {
-                      console.error('Error adding additional sample data:', err);
-                    } else {
-                      console.log('Additional sample data added successfully');
-                      
-                      // Also add users data
-                      try {
-                        const usersData = await fs.readFile(path.join(__dirname, 'models/users_data.sql'), 'utf8');
-                        db.exec(usersData, (err) => {
-                          if (err) {
-                            console.error('Error adding users data:', err);
-                          } else {
-                            console.log('Users data added successfully');
-                          }
-                          
-                          // Generate sample PDFs for the resumes after all data is added
-                          generateSamplePDFs();
-                        });
-                      } catch (err) {
-                        console.error('Error reading users data file:', err);
-                        // Still generate PDFs even if users data fails
-                        generateSamplePDFs();
-                      }
-                    }
-                  });
-                } catch (err) {
-                  console.error('Error reading additional data file:', err);
-                }
+                // Generate sample PDFs for the resumes after sample data is added
+                generateSamplePDFs();
               }
             });
           } catch (err) {
@@ -218,44 +197,51 @@ async function initializeDatabase() {
         } else {
           console.log(`Database already contains ${result.count} applicants`);
           
-          // Check if we need to add user data
-          db.get('SELECT COUNT(*) as count FROM User', async (err, userResult) => {
+          // Check if we have locations (required for application to function)
+          db.get('SELECT COUNT(*) as count FROM Location', async (err, locationResult) => {
             if (err) {
-              console.error('Error checking user count:', err);
-              generateSamplePDFs();
+              console.error('Error checking location count:', err);
               return;
             }
             
-            // If we have only the default dev user or no users at all
-            if (userResult.count <= 1) {
-              console.log('Adding sample user data...');
+            // If no locations exist, add only the default locations (needed for functionality)
+            if (locationResult.count === 0) {
+              console.log('Adding default locations...');
               try {
-                const usersData = await fs.readFile(path.join(__dirname, 'models/users_data.sql'), 'utf8');
-                db.exec(usersData, (err) => {
+                // A simplified SQL to just add the locations
+                const locationSql = `
+                  INSERT OR IGNORE INTO Location (name) VALUES ('Fayetteville');
+                  INSERT OR IGNORE INTO Location (name) VALUES ('Rogers');
+                  INSERT OR IGNORE INTO Location (name) VALUES ('Siloam Springs');
+                  INSERT OR IGNORE INTO Location (name) VALUES ('Conway');
+                  INSERT OR IGNORE INTO Location (name) VALUES ('Jonesboro');
+                `;
+                db.exec(locationSql, (err) => {
                   if (err) {
-                    console.error('Error adding users data:', err);
+                    console.error('Error adding default locations:', err);
                   } else {
-                    console.log('Users data added successfully');
+                    console.log('Default locations added successfully');
                   }
-                  
-                  // Generate sample PDFs
-                  generateSamplePDFs();
                 });
               } catch (err) {
-                console.error('Error reading users data file:', err);
-                generateSamplePDFs();
+                console.error('Error adding default locations:', err);
               }
-            } else {
-              console.log(`Database already contains ${userResult.count} users`);
-              // Even if the database already has data, make sure PDFs exist
-              generateSamplePDFs();
             }
           });
+          
+          // Ensure PDFs exist but don't add more sample data
+          generateSamplePDFs();
         }
       });
     });
+      } else {
+        console.log('Database schema already exists, skipping initialization');
+        // Just ensure sample PDFs exist
+        generateSamplePDFs();
+      }
+    });
   } catch (err) {
-    console.error('Failed to read SQL file:', err);
+    console.error('Failed to initialize database:', err);
   }
 }
 
