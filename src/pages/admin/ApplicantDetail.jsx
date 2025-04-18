@@ -622,17 +622,19 @@ function ApplicantDetail() {
           }
           
           .location-tag, .population-tag {
-            background-color: var(--primary-focus);
+            background-color: rgba(67, 97, 238, 0.2);
             color: var(--primary);
             font-size: var(--font-size-sm);
             font-weight: 500;
             padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-full);
+            border: 1px solid rgba(67, 97, 238, 0.4);
           }
           
           .population-tag {
-            background-color: rgba(16, 185, 129, 0.1);
+            background-color: rgba(16, 185, 129, 0.2);
             color: rgb(16, 185, 129);
+            border: 1px solid rgba(16, 185, 129, 0.4);
           }
           
           .flag {
@@ -645,18 +647,21 @@ function ApplicantDetail() {
           }
           
           .flag.success {
-            background-color: rgba(16, 185, 129, 0.1);
+            background-color: rgba(16, 185, 129, 0.2);
             color: rgb(16, 185, 129);
+            border: 1px solid rgba(16, 185, 129, 0.4);
           }
           
           .flag.warning {
-            background-color: rgba(245, 158, 11, 0.1);
+            background-color: rgba(245, 158, 11, 0.2);
             color: rgb(245, 158, 11);
+            border: 1px solid rgba(245, 158, 11, 0.4);
           }
           
           .flag.caution {
-            background-color: rgba(231, 70, 70, 0.1);
+            background-color: rgba(231, 70, 70, 0.2);
             color: rgb(231, 70, 70);
+            border: 1px solid rgba(231, 70, 70, 0.4);
           }
           
           .explanation-box {
@@ -731,16 +736,17 @@ function ApplicantDetail() {
             align-items: center;
             gap: var(--space-2);
             padding: var(--space-2) var(--space-4);
-            background-color: var(--primary-focus);
+            background-color: rgba(67, 97, 238, 0.2);
             color: var(--primary);
             border-radius: var(--radius-md);
             font-weight: 500;
             text-decoration: none;
             transition: all var(--transition-fast);
+            border: 1px solid rgba(67, 97, 238, 0.4);
           }
           
           .resume-link:hover {
-            background-color: rgba(96, 165, 250, 0.2);
+            background-color: rgba(67, 97, 238, 0.3);
           }
           
           .status-select-not-viewed {
