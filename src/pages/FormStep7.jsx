@@ -7,13 +7,13 @@ function FormStep7() {
   const navigate = useNavigate();
   const { formData, setFormData } = useFormStore();
   
-  // Initialize with at least 3 references if there are none
+  // Initialize with at least 3 references if there are none - one of each required type
   const defaultReferences = formData.references?.length > 0 
     ? formData.references 
     : [
         { name: '', relationship: '', phone: '', email: '', type: 'professional' },
-        { name: '', relationship: '', phone: '', email: '', type: 'professional' },
-        { name: '', relationship: '', phone: '', email: '', type: 'character' }
+        { name: '', relationship: '', phone: '', email: '', type: 'character' },
+        { name: '', relationship: '', phone: '', email: '', type: 'academic' }
       ];
   
   const { register, control, handleSubmit, formState: { errors }, watch } = useForm({
@@ -49,6 +49,17 @@ function FormStep7() {
       return;
     }
     
+    // Check if we have at least one of each required reference type
+    const referenceTypes = data.references.map(ref => ref.type);
+    const hasProfessional = referenceTypes.includes('professional');
+    const hasCharacter = referenceTypes.includes('character');
+    const hasAcademic = referenceTypes.includes('academic');
+    
+    if (!hasProfessional || !hasCharacter || !hasAcademic) {
+      alert('You must include at least one professional, one character, and one academic reference.');
+      return;
+    }
+    
     setFormData(data);
     navigate('/form/step8');
   };
@@ -56,17 +67,56 @@ function FormStep7() {
   return (
     <div className="container">
       <header className="app-header">
-        <h1 className="app-title">References</h1>
+        <h1 className="app-title">The Joshua Center</h1>
+        <p className="app-subtitle">Job Application Portal</p>
       </header>
       
       <Breadcrumbs />
       
       <main>
+        <h1 className="page-title">References Information</h1>
+        <p className="page-description">Step 7 of 9: Provide contact information for your references.</p>
+        
+        <div className="disclaimer-container">
+          <div className="disclaimer">
+            <div className="disclaimer-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div className="disclaimer-content">
+              <h3>Email Notification</h3>
+              <p><strong>IMPORTANT:</strong> An email will be sent to each reference to confirm their information when your application is submitted. Please ensure all email addresses are correct.</p>
+            </div>
+          </div>
+          
+          <div className="disclaimer">
+            <div className="disclaimer-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div className="disclaimer-content">
+              <h3>Required Reference Types</h3>
+              <p><strong>REQUIRED:</strong> You must provide three different types of references:</p>
+              <ul>
+                <li>One <strong>Professional</strong> reference (supervisor, manager, colleague)</li>
+                <li>One <strong>Character</strong> reference (personal reference, not a family member)</li>
+                <li>One <strong>Academic</strong> reference (professor, advisor, teacher)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
         <div className="card">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-section">
-              <h2 className="form-section-heading">Professional & Character References</h2>
-              <p>Please provide at least three references. At least one must be a professional reference (e.g., supervisor, colleague).</p>
+              <h2 className="form-section-heading">Reference Details</h2>
+              <p>Please provide at least three references as specified above.</p>
               
               {fields.map((field, index) => (
                 <div key={field.id} className="reference-entry form-subsection">
@@ -199,7 +249,7 @@ function FormStep7() {
         .reference-entry {
           margin-bottom: 2rem;
           padding-bottom: 1rem;
-          border-bottom: 1px solid var(--gray-200);
+          border-bottom: 1px solid var(--gray-600);
         }
         
         .entry-header {
@@ -212,7 +262,7 @@ function FormStep7() {
         .entry-title {
           font-size: 1.1rem;
           font-weight: 600;
-          color: var(--gray-800);
+          color: var(--gray-100);
           margin: 0;
         }
         
@@ -250,6 +300,79 @@ function FormStep7() {
         
         .form-subsection {
           margin-bottom: 2rem;
+        }
+        
+        /* Disclaimer styles */
+        .disclaimer-container {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          margin-bottom: 2rem;
+        }
+        
+        .disclaimer {
+          background-color: var(--gray-800);
+          border-radius: var(--radius-lg);
+          padding: 1.5rem;
+          display: flex;
+          gap: 1rem;
+          border-left: 4px solid var(--primary);
+          box-shadow: var(--shadow-md);
+        }
+        
+        .disclaimer:nth-child(2) {
+          border-left-color: var(--danger);
+        }
+        
+        .disclaimer-icon {
+          flex-shrink: 0;
+          color: var(--primary);
+          margin-top: 0.2rem;
+        }
+        
+        .disclaimer:nth-child(2) .disclaimer-icon {
+          color: var(--danger);
+        }
+        
+        .disclaimer-content {
+          flex: 1;
+        }
+        
+        .disclaimer h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          margin: 0 0 0.5rem 0;
+          color: var(--gray-100);
+        }
+        
+        .disclaimer p {
+          margin: 0 0 0.5rem 0;
+          color: var(--gray-300);
+        }
+        
+        .disclaimer ul {
+          margin: 0.5rem 0 0 1.5rem;
+          padding: 0;
+          color: var(--gray-300);
+        }
+        
+        .disclaimer li {
+          margin-bottom: 0.5rem;
+        }
+        
+        .disclaimer strong {
+          color: var(--gray-100);
+        }
+        
+        @media (max-width: 768px) {
+          .disclaimer {
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+          
+          .disclaimer-icon {
+            margin-top: 0;
+          }
         }
       `}</style>
     </div>
