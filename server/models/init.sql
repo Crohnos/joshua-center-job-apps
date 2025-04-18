@@ -75,6 +75,13 @@ INSERT OR IGNORE INTO Location (name) VALUES ('Siloam Springs');
 INSERT OR IGNORE INTO Location (name) VALUES ('Conway');
 INSERT OR IGNORE INTO Location (name) VALUES ('Jonesboro');
 
--- Insert a dummy admin user for development if it doesn't exist
+-- Insert default admin users if they don't exist
 INSERT OR IGNORE INTO User (email, first_name, last_name, active) 
 VALUES ('dev@example.com', 'Development', 'User', 1);
+
+-- Insert additional required users
+INSERT OR IGNORE INTO User (email, first_name, last_name, active) 
+VALUES ('john.graham@example.com', 'John', 'Graham', 1);
+
+INSERT OR IGNORE INTO User (email, first_name, last_name, active) 
+VALUES ('olivia.jones@example.com', 'Olivia', 'Jones', 1);

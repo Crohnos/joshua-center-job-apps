@@ -34,6 +34,13 @@ VALUES ('hr@thejoshuacenter.com', 'HR', 'Manager', 1);
 INSERT INTO User (email, first_name, last_name, active) 
 VALUES ('operations@thejoshuacenter.com', 'Operations', 'Manager', 1);
 
+-- Required users
+INSERT INTO User (email, first_name, last_name, active) 
+VALUES ('john.graham@example.com', 'John', 'Graham', 1);
+
+INSERT INTO User (email, first_name, last_name, active) 
+VALUES ('olivia.jones@example.com', 'Olivia', 'Jones', 1);
+
 -- Inactive user example
 INSERT INTO User (email, first_name, last_name, active) 
 VALUES ('former.employee@thejoshuacenter.com', 'Former', 'Employee', 0);

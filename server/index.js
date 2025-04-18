@@ -227,6 +227,44 @@ async function initializeDatabase() {
                 console.error('Error adding default locations:', err);
               }
             }
+            
+            // Check if the required users exist
+            db.all("SELECT email FROM User WHERE email IN ('john.graham@example.com', 'olivia.jones@example.com')", (err, userResults) => {
+              if (err) {
+                console.error('Error checking for required users:', err);
+                return;
+              }
+              
+              // Count how many of the required users were found
+              const foundEmails = userResults.map(row => row.email);
+              const missingUsers = [];
+              
+              if (!foundEmails.includes('john.graham@example.com')) {
+                missingUsers.push("('john.graham@example.com', 'John', 'Graham', 1)");
+              }
+              
+              if (!foundEmails.includes('olivia.jones@example.com')) {
+                missingUsers.push("('olivia.jones@example.com', 'Olivia', 'Jones', 1)");
+              }
+              
+              // If any required users are missing, add them
+              if (missingUsers.length > 0) {
+                console.log(`Adding ${missingUsers.length} required users...`);
+                
+                const userSql = `
+                  INSERT OR IGNORE INTO User (email, first_name, last_name, active) 
+                  VALUES ${missingUsers.join(', ')};
+                `;
+                
+                db.exec(userSql, (err) => {
+                  if (err) {
+                    console.error('Error adding required users:', err);
+                  } else {
+                    console.log('Required users added successfully');
+                  }
+                });
+              }
+            });
           });
           
           // Ensure PDFs exist but don't add more sample data
