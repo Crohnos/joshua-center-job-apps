@@ -242,6 +242,9 @@ tbody tr:hover {
   margin-top: var(--space-2);
   font-weight: 500;
   font-style: italic;
+  background-color: rgba(67, 97, 238, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-md);
 }
 
 .info-message svg {

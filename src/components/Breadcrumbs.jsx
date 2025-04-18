@@ -49,7 +49,7 @@ function Breadcrumbs() {
       
       {/* Admin Link - Always visible */}
       <div style={{ textAlign: 'right', padding: '10px 20px', fontSize: '0.8rem' }}>
-        <Link to="/admin/applicants" style={{ color: 'var(--gray-300)', textDecoration: 'underline' }}>
+        <Link to="/admin/applicants" style={{ color: 'var(--gray-200)', textDecoration: 'underline', fontWeight: 'bold' }}>
           Admin Dashboard →
         </Link>
       </div>
