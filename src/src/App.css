@@ -856,6 +856,7 @@ tbody tr:hover {
   width: 100%;
   max-width: 1100px;
   box-sizing: border-box;
+  border: 1px solid var(--gray-700);
 }
 
 .data-table-header {
@@ -898,7 +899,7 @@ tbody tr:hover {
 }
 
 .data-table thead {
-  background-color: var(--gray-50);
+  background-color: var(--gray-700);
 }
 
 .data-table th {
@@ -908,8 +909,8 @@ tbody tr:hover {
   font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--gray-700);
-  border-bottom: 1px solid var(--gray-200);
+  color: var(--gray-100);
+  border-bottom: 1px solid var(--gray-600);
   white-space: nowrap;
   box-sizing: border-box;
   position: relative;
@@ -917,12 +918,14 @@ tbody tr:hover {
 
 .data-table td {
   padding: var(--space-4) var(--space-4);
-  border-bottom: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-600);
   vertical-align: middle;
   white-space: normal;
   word-wrap: break-word;
   box-sizing: border-box;
   position: relative;
+  color: var(--gray-300);
+  background-color: var(--gray-800);
 }
 
 .data-table th:first-child,
@@ -941,10 +944,11 @@ tbody tr:hover {
 
 .data-table tbody tr {
   transition: background-color 0.15s ease;
+  background-color: var(--gray-800);
 }
 
 .data-table tbody tr:hover {
-  background-color: var(--gray-50);
+  background-color: var(--gray-700);
 }
 
 /* Column widths - using percentages to ensure flexibility */

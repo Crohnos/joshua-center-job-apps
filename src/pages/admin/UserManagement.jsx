@@ -298,11 +298,13 @@ function UserManagement() {
         <style jsx="true">{`
           /* New User Management Table Styles */
           .user-management-table-container {
-            background-color: white;
+            background-color: var(--gray-800);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
             margin-bottom: var(--space-4);
             width: 100%;
+            border: 1px solid var(--gray-700);
+            color: var(--gray-300);
           }
           
           .user-management-table {
@@ -313,15 +315,17 @@ function UserManagement() {
           
           .user-table-header {
             display: flex;
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
             font-weight: 600;
-            border-bottom: 2px solid var(--gray-200);
+            border-bottom: 2px solid var(--gray-600);
+            color: var(--gray-100);
           }
           
           .user-table-row {
             display: flex;
-            border-bottom: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-700);
             transition: background-color 0.2s ease;
+            color: var(--gray-300);
           }
           
           .user-table-row:last-child {
@@ -329,7 +333,7 @@ function UserManagement() {
           }
           
           .user-table-row:hover {
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
           }
           
           .user-table-cell {
@@ -418,9 +422,9 @@ function UserManagement() {
             padding: var(--space-1) var(--space-2);
             min-width: 50px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--gray-300);
-            background-color: white;
-            color: var(--gray-700);
+            border: 1px solid var(--gray-600);
+            background-color: var(--gray-800);
+            color: var(--gray-300);
             font-size: 11px;
             font-weight: 500;
             text-align: center;
@@ -432,7 +436,7 @@ function UserManagement() {
           
           
           .user-action-button:hover {
-            background-color: var(--gray-100);
+            background-color: var(--gray-700);
             transform: translateY(-1px);
             box-shadow: var(--shadow-sm);
           }
@@ -472,7 +476,7 @@ function UserManagement() {
           .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid var(--gray-200);
+            border: 4px solid var(--gray-600);
             border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -488,7 +492,8 @@ function UserManagement() {
             gap: var(--space-4);
             padding: var(--space-6);
             border-radius: var(--radius-lg);
-            background-color: rgba(96, 165, 250, 0.1);
+            background-color: var(--gray-700);
+            border: 1px solid var(--gray-600);
           }
           
           .alert-icon {
@@ -574,8 +579,8 @@ function UserManagement() {
           }
           
           .status-inactive {
-            background-color: var(--gray-100);
-            color: var(--gray-600);
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
           }
           
           /* Modal styles */
@@ -595,7 +600,7 @@ function UserManagement() {
           }
           
           .modal {
-            background-color: white;
+            background-color: var(--gray-800);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-xl);
             width: 100%;
@@ -608,6 +613,8 @@ function UserManagement() {
             z-index: 10001;
             pointer-events: auto;
             padding-bottom: var(--space-4);
+            border: 1px solid var(--gray-700);
+            color: var(--gray-300);
           }
           
           @keyframes modalFadeIn {
@@ -626,7 +633,7 @@ function UserManagement() {
             align-items: center;
             justify-content: space-between;
             padding: var(--space-6);
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-600);
             margin-bottom: var(--space-2);
           }
           
@@ -634,7 +641,7 @@ function UserManagement() {
             margin: 0;
             font-size: var(--font-size-xl);
             font-weight: 600;
-            color: var(--gray-900);
+            color: var(--gray-100);
           }
           
           .modal-close {
@@ -693,7 +700,7 @@ function UserManagement() {
             display: block;
             margin-bottom: var(--space-3);
             font-weight: 500;
-            color: var(--gray-700);
+            color: var(--gray-300);
             font-size: 0.9rem;
           }
           
@@ -703,11 +710,12 @@ function UserManagement() {
             height: 42px;
             padding: 0 var(--space-4);
             border-radius: var(--radius-md);
-            border: 1px solid var(--gray-300);
+            border: 1px solid var(--gray-600);
             transition: all var(--transition-fast);
             box-sizing: border-box;
             font-size: 0.95rem;
-            background-color: white;
+            background-color: var(--gray-700);
+            color: var(--gray-200);
           }
           
           .form-field input:focus {
@@ -728,10 +736,10 @@ function UserManagement() {
           }
           
           .checkbox-section {
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
             border-radius: var(--radius-md);
             padding: var(--space-4);
-            border: 1px solid var(--gray-200);
+            border: 1px solid var(--gray-600);
           }
           
           .checkbox {
@@ -747,11 +755,11 @@ function UserManagement() {
             margin-bottom: var(--space-2);
             cursor: pointer;
             font-weight: 500;
-            color: var(--gray-700);
+            color: var(--gray-300);
           }
           
           .checkbox-helper-text {
-            color: var(--gray-600);
+            color: var(--gray-400);
             font-size: 0.85rem;
             margin-left: 31px;
           }
@@ -769,7 +777,7 @@ function UserManagement() {
             gap: var(--space-4);
             padding: var(--space-6);
             padding-top: var(--space-4);
-            border-top: 1px solid var(--gray-200);
+            border-top: 1px solid var(--gray-600);
             margin-top: var(--space-6);
           }
           
