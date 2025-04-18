@@ -157,7 +157,7 @@ function ApplicantDetail() {
                 {applicant.name?.charAt(0) || '?'}
               </div>
               <div>
-                <h2>{applicant.name}</h2>
+                <h2 style={{ color: 'var(--gray-100)' }}>{applicant.name}</h2>
                 <div className="applicant-contact">
                   <div><strong>Email:</strong> {applicant.email}</div>
                   <div><strong>Phone:</strong> {applicant.phone}</div>
@@ -446,7 +446,7 @@ function ApplicantDetail() {
             flex-wrap: wrap;
             gap: var(--space-6);
             padding: var(--space-6);
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-700);
             max-width: 1100px;
             margin: 0 auto;
             width: 100%;
@@ -469,15 +469,22 @@ function ApplicantDetail() {
           
           .applicant-contact {
             margin-top: var(--space-2);
-            color: var(--gray-600);
+            color: var(--gray-300);
           }
           
           .application-status-card {
             flex: 1;
             min-width: 300px;
-            background-color: var(--gray-50);
+            background-color: var(--gray-800);
             padding: var(--space-4);
             border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-700);
+            box-shadow: var(--shadow-sm);
+          }
+          
+          .application-status-card h3 {
+            color: var(--gray-100);
+            margin-top: 0;
           }
           
           .status-form {
@@ -501,7 +508,7 @@ function ApplicantDetail() {
           .applicant-details-tabs {
             display: flex;
             gap: var(--space-2);
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-700);
             padding: 0 var(--space-6);
           }
           
@@ -513,7 +520,7 @@ function ApplicantDetail() {
             background: transparent;
             border: none;
             font-weight: 500;
-            color: var(--gray-600);
+            color: var(--gray-400);
             cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: all var(--transition-fast);
@@ -539,11 +546,12 @@ function ApplicantDetail() {
           }
           
           .detail-card {
-            background-color: white;
+            background-color: var(--gray-800);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
             overflow: hidden;
             width: 100%;
+            border: 1px solid var(--gray-700);
           }
           
           .detail-card.flex-1 {
@@ -551,16 +559,22 @@ function ApplicantDetail() {
           }
           
           .detail-card-title {
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
             padding: var(--space-3) var(--space-4);
             margin: 0;
             font-size: var(--font-size-base);
             font-weight: 600;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-600);
+            color: var(--gray-100);
           }
           
           .detail-card-content {
             padding: var(--space-4);
+            color: var(--gray-300);
+          }
+          
+          .detail-card-content strong {
+            color: var(--gray-100);
           }
           
           .resume-container {
@@ -625,11 +639,17 @@ function ApplicantDetail() {
           }
           
           .explanation-box {
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
             border-radius: var(--radius-md);
             padding: var(--space-3);
             margin-top: var(--space-2);
             font-size: var(--font-size-sm);
+            border: 1px solid var(--gray-600);
+          }
+          
+          .explanation-box p {
+            color: var(--gray-300);
+            margin: 0;
           }
           
           .education-content {
@@ -639,12 +659,13 @@ function ApplicantDetail() {
             background: none;
             padding: 0;
             margin: 0;
+            color: var(--gray-300);
           }
           
           .employment-card {
             margin-bottom: var(--space-4);
             padding-bottom: var(--space-4);
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-600);
           }
           
           .employment-card:last-child {
@@ -656,6 +677,7 @@ function ApplicantDetail() {
           .employment-card h4 {
             margin-top: 0;
             margin-bottom: var(--space-2);
+            color: var(--gray-100);
           }
           
           .references-list {
@@ -665,14 +687,16 @@ function ApplicantDetail() {
           }
           
           .reference-card {
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
             padding: var(--space-4);
             border-radius: var(--radius-md);
+            border: 1px solid var(--gray-600);
           }
           
           .reference-card h4 {
             margin-top: 0;
             margin-bottom: var(--space-1);
+            color: var(--gray-100);
           }
           
           .reference-type {
@@ -716,7 +740,7 @@ function ApplicantDetail() {
           
           .back-button-container {
             padding: var(--space-6);
-            border-top: 1px solid var(--gray-200);
+            border-top: 1px solid var(--gray-700);
             max-width: 1100px;
             margin: 0 auto;
             width: 100%;
