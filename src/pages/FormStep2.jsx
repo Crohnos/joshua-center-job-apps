@@ -102,9 +102,12 @@ function FormStep2() {
       <Breadcrumbs />
       
       <main>
+        <h1 className="page-title">Contact Information</h1>
+        <p className="page-description">Step 2 of 9: Please provide your contact details so we can reach you.</p>
+        
         <div className="card">
           <div className="form-section">
-            <h2 className="form-section-heading">Contact Information</h2>
+            <h2 className="form-section-heading">Contact Details</h2>
             <p>Please provide your current contact details. All communications regarding your application will be sent to these addresses.</p>
           </div>
           

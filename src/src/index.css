@@ -136,6 +136,22 @@ main {
   margin-bottom: var(--space-20);
 }
 
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--primary);
+  margin: var(--space-6) 0 var(--space-2) 0;
+  text-align: center;
+}
+
+.page-description {
+  color: var(--gray-400);
+  font-size: var(--font-size-lg);
+  text-align: center;
+  margin: 0 auto var(--space-8) auto;
+  max-width: 600px;
+}
+
 /* Cards */
 .card {
   background-color: var(--gray-800);
@@ -617,13 +633,15 @@ input[type="radio"]:focus {
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
   flex: 1;
-  min-width: 0;
+  min-width: 120px;
   margin: var(--space-1);
+  text-align: center;
 }
 
 .breadcrumbs-item-inner {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: var(--space-3) var(--space-3);
   border-radius: var(--radius-lg);
   height: 100%;
@@ -647,11 +665,7 @@ input[type="radio"]:focus {
   flex-shrink: 0;
 }
 
-.step-icon {
-  display: inline-block;
-  margin-right: var(--space-1);
-  font-size: 16px;
-}
+/* Removed step-icon styling */
 
 .step-label, .breadcrumbs-item-inner a {
   text-overflow: ellipsis;
@@ -748,12 +762,12 @@ input[type="radio"]:focus {
   
   .breadcrumbs-item {
     flex: 0 0 auto;
-    min-width: 120px;
+    min-width: 80px;
     margin: var(--space-1);
   }
   
   .step-label, .breadcrumbs-item-inner a {
-    max-width: 80px;
+    max-width: 60px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
