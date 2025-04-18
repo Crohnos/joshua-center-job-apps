@@ -67,10 +67,13 @@ function FormStep4() {
       <Breadcrumbs />
       
       <main>
+        <h1 className="page-title">Interests & Preferences</h1>
+        <p className="page-description">Step 4 of 9: Tell us about your professional interests and preferred work settings.</p>
+        
         <div className="card">
           <div className="form-section">
-            <h2 className="form-section-heading">Interests & Preferences</h2>
-            <p>Please tell us about your professional interests and preferences to help us find the best match for your skills.</p>
+            <h2 className="form-section-heading">Professional Focus</h2>
+            <p>Please tell us about your specific interests and preferences to help us find the best match for your skills.</p>
           </div>
           
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -130,9 +133,9 @@ function FormStep4() {
             
             {/* Population checkboxes */}
             <div className="form-section">
+              <label className="question-label">What populations are you interested in working with?</label>
+              <small className="helper-text">Select all that apply</small>
               <fieldset className="checkbox-fieldset">
-                <legend className="fieldset-legend">What populations are you interested in working with?</legend>
-                <small className="helper-text">Select all that apply</small>
                 
                 <div className="checkbox-grid">
                   {populationOptions.map(population => (
@@ -157,9 +160,9 @@ function FormStep4() {
             
             {/* Location checkboxes */}
             <div className="form-section">
+              <label className="question-label">Which locations are you interested in working at?</label>
+              <small className="helper-text">Select all that apply</small>
               <fieldset className="checkbox-fieldset">
-                <legend className="fieldset-legend">Which locations are you interested in working at?</legend>
-                <small className="helper-text">Select all that apply</small>
                 
                 {isLoading ? (
                   <div className="loader-container">
