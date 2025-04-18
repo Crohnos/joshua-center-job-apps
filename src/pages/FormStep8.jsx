@@ -23,23 +23,27 @@ function FormStep8() {
   return (
     <div className="container">
       <header className="app-header">
-        <h1 className="app-title">Demographics</h1>
+        <h1 className="app-title">The Joshua Center</h1>
+        <p className="app-subtitle">Job Application Portal</p>
       </header>
       
       <Breadcrumbs />
       
       <main>
+        <h1 className="page-title">Demographics</h1>
+        <p className="page-description">Step 8 of 9: Share demographic information to support our diversity initiatives.</p>
+        
         <div className="card">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-section">
-              <h2 className="form-section-heading">Optional Demographic Information</h2>
+              <h2 className="form-section-heading">Diversity Information</h2>
               <p>
                 This information is collected for diversity and inclusion purposes. 
                 Your responses are voluntary and will not affect your employment eligibility.
               </p>
               
               <div className="form-field field-with-limit">
-                <label htmlFor="languages">Languages Spoken (other than English)</label>
+                <label htmlFor="languages" className="question-label">Languages Spoken (other than English)</label>
                 <input 
                   type="text" 
                   id="languages" 
@@ -51,7 +55,7 @@ function FormStep8() {
               </div>
               
               <div className="form-field field-with-limit">
-                <label htmlFor="gender">Gender Identity</label>
+                <label htmlFor="gender" className="question-label">Gender Identity</label>
                 <select 
                   id="gender"
                   aria-invalid={errors.gender ? "true" : "false"}
@@ -70,7 +74,7 @@ function FormStep8() {
               </div>
               
               <div className="form-field field-with-limit">
-                <label htmlFor="raceEthnicity">Race/Ethnicity</label>
+                <label htmlFor="raceEthnicity" className="question-label">Race/Ethnicity</label>
                 <select 
                   id="raceEthnicity"
                   aria-invalid={errors.raceEthnicity ? "true" : "false"}
@@ -95,45 +99,17 @@ function FormStep8() {
             <div className="form-footer">
               <button 
                 type="button" 
-                className="secondary outline" 
+                className="button secondary" 
                 onClick={() => navigate('/form/step7')}
               >
                 Back
               </button>
-              <button type="submit" className="primary">Review & Submit</button>
+              <button type="submit" className="button primary">Review & Submit</button>
             </div>
           </form>
         </div>
       </main>
       
-      <style jsx>{`
-        .field-with-limit input,
-        .field-with-limit select,
-        .field-with-limit textarea {
-          width: 100%;
-          box-sizing: border-box;
-          max-width: 100%;
-        }
-        
-        .helper-text {
-          color: var(--gray-600);
-          font-size: 0.875rem;
-          margin-top: 0.5rem;
-          font-style: italic;
-        }
-        
-        .form-field {
-          margin-bottom: 1.5rem;
-        }
-        
-        .form-footer {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 2rem;
-          padding-top: 1.5rem;
-          border-top: 1px solid var(--gray-200);
-        }
-      `}</style>
     </div>
   );
 }
