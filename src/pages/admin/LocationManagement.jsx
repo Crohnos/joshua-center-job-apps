@@ -239,7 +239,7 @@ function LocationManagement() {
           .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid var(--gray-200);
+            border: 4px solid var(--gray-600);
             border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -255,7 +255,8 @@ function LocationManagement() {
             gap: var(--space-4);
             padding: var(--space-6);
             border-radius: var(--radius-lg);
-            background-color: rgba(96, 165, 250, 0.1);
+            background-color: var(--gray-700);
+            border: 1px solid var(--gray-600);
           }
           
           .alert-icon {
@@ -269,11 +270,13 @@ function LocationManagement() {
           
           /* New Location Management Table Styles */
           .location-management-table-container {
-            background-color: white;
+            background-color: var(--gray-800);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
             margin-bottom: var(--space-4);
             width: 100%;
+            border: 1px solid var(--gray-700);
+            color: var(--gray-300);
           }
           
           .location-management-table {
@@ -284,15 +287,17 @@ function LocationManagement() {
           
           .location-table-header {
             display: flex;
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
             font-weight: 600;
-            border-bottom: 2px solid var(--gray-200);
+            border-bottom: 2px solid var(--gray-600);
+            color: var(--gray-100);
           }
           
           .location-table-row {
             display: flex;
-            border-bottom: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-700);
             transition: background-color 0.2s ease;
+            color: var(--gray-300);
           }
           
           .location-table-row:last-child {
@@ -300,7 +305,7 @@ function LocationManagement() {
           }
           
           .location-table-row:hover {
-            background-color: var(--gray-50);
+            background-color: var(--gray-700);
           }
           
           .location-table-cell {
@@ -327,7 +332,7 @@ function LocationManagement() {
             align-items: center;
             font-weight: 500;
             font-size: 0.95rem;
-            color: var(--gray-800);
+            color: var(--gray-300);
           }
           
           .location-actions {
@@ -343,9 +348,9 @@ function LocationManagement() {
             padding: var(--space-1) var(--space-2);
             min-width: 50px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--gray-300);
-            background-color: white;
-            color: var(--gray-700);
+            border: 1px solid var(--gray-600);
+            background-color: var(--gray-800);
+            color: var(--gray-300);
             font-size: 11px;
             font-weight: 500;
             text-align: center;
@@ -356,7 +361,7 @@ function LocationManagement() {
           }
           
           .location-action-button:hover {
-            background-color: var(--gray-100);
+            background-color: var(--gray-700);
             transform: translateY(-1px);
             box-shadow: var(--shadow-sm);
           }
@@ -396,7 +401,7 @@ function LocationManagement() {
           }
           
           .modal {
-            background-color: white;
+            background-color: var(--gray-800);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-xl);
             width: 100%;
@@ -409,6 +414,8 @@ function LocationManagement() {
             z-index: 10001;
             pointer-events: auto;
             padding-bottom: var(--space-4);
+            border: 1px solid var(--gray-700);
+            color: var(--gray-300);
           }
           
           @keyframes modalFadeIn {
@@ -427,7 +434,7 @@ function LocationManagement() {
             align-items: center;
             justify-content: space-between;
             padding: var(--space-6);
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-600);
             margin-bottom: var(--space-2);
           }
           
@@ -435,7 +442,7 @@ function LocationManagement() {
             margin: 0;
             font-size: var(--font-size-xl);
             font-weight: 600;
-            color: var(--gray-900);
+            color: var(--gray-100);
           }
           
           .modal-close {
@@ -487,7 +494,7 @@ function LocationManagement() {
             display: block;
             margin-bottom: var(--space-3);
             font-weight: 500;
-            color: var(--gray-700);
+            color: var(--gray-300);
             font-size: 0.9rem;
           }
           
@@ -496,11 +503,12 @@ function LocationManagement() {
             height: 42px;
             padding: 0 var(--space-4);
             border-radius: var(--radius-md);
-            border: 1px solid var(--gray-300);
+            border: 1px solid var(--gray-600);
             transition: all var(--transition-fast);
             box-sizing: border-box;
             font-size: 0.95rem;
-            background-color: white;
+            background-color: var(--gray-700);
+            color: var(--gray-200);
           }
           
           .form-field input:focus {
@@ -526,7 +534,7 @@ function LocationManagement() {
             gap: var(--space-4);
             padding: var(--space-6);
             padding-top: var(--space-4);
-            border-top: 1px solid var(--gray-200);
+            border-top: 1px solid var(--gray-600);
             margin-top: var(--space-6);
           }
           
