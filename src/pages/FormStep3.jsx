@@ -36,10 +36,13 @@ function FormStep3() {
       <Breadcrumbs />
       
       <main>
+        <h1 className="page-title">Eligibility & Qualifications</h1>
+        <p className="page-description">Step 3 of 9: Please answer these important qualification questions.</p>
+        
         <div className="card">
           <div className="form-section">
-            <h2 className="form-section-heading">Qualifications</h2>
-            <p>Please provide information about your eligibility and qualifications for this position.</p>
+            <h2 className="form-section-heading">Legal Requirements</h2>
+            <p>Please provide information about your eligibility and legal qualifications for this position.</p>
           </div>
           
           <form onSubmit={handleSubmit(onSubmit)}>
