@@ -88,12 +88,16 @@ function FormSubmit() {
   return (
     <div className="container">
       <header className="app-header">
-        <h1 className="app-title">Submit Application</h1>
+        <h1 className="app-title">The Joshua Center</h1>
+        <p className="app-subtitle">Job Application Portal</p>
       </header>
       
       <Breadcrumbs />
       
       <main>
+        <h1 className="page-title">Resume & Final Submission</h1>
+        <p className="page-description">Step 9 of 9: Upload your resume and submit your application.</p>
+        
         <div className="card">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-section">
@@ -164,7 +168,7 @@ function FormSubmit() {
             <div className="form-footer">
               <button 
                 type="button" 
-                className="secondary outline" 
+                className="button secondary" 
                 onClick={() => navigate('/form/step8')}
               >
                 Back
@@ -172,7 +176,7 @@ function FormSubmit() {
               
               <button 
                 type="submit" 
-                className="primary submit-button" 
+                className="button primary submit-button" 
                 aria-busy={isSubmitting}
                 disabled={isSubmitting}
               >
@@ -198,22 +202,23 @@ function FormSubmit() {
         
         .file-input {
           padding: 1rem;
-          border: 2px dashed var(--gray-300);
+          border: 2px dashed var(--gray-600);
           border-radius: 0.5rem;
           width: 100%;
           box-sizing: border-box;
-          background-color: var(--gray-50);
+          background-color: var(--gray-800);
           cursor: pointer;
+          color: var(--gray-300);
         }
         
         .file-input:hover {
           border-color: var(--primary);
-          background-color: var(--primary-focus);
+          background-color: rgba(67, 97, 238, 0.1);
         }
         
         .helper-text {
-          color: var(--gray-600);
-          font-size: 0.875rem;
+          color: var(--gray-400);
+          font-size: var(--font-size-sm);
           margin-top: 0.5rem;
           font-style: italic;
         }
@@ -227,15 +232,15 @@ function FormSubmit() {
         }
         
         .alert.danger {
-          background-color: #fef2f2;
-          border-left: 4px solid #ef4444;
-          color: #b91c1c;
+          background-color: rgba(239, 68, 68, 0.1);
+          border-left: 4px solid var(--danger);
+          color: var(--gray-100);
         }
         
         .alert-icon {
           display: flex;
           align-items: flex-start;
-          color: #ef4444;
+          color: var(--danger);
         }
         
         .alert-content {
@@ -245,39 +250,64 @@ function FormSubmit() {
         .alert-title {
           font-weight: 600;
           margin-bottom: 0.25rem;
+          color: var(--danger);
         }
         
         .alert-content p {
           margin: 0;
+          color: var(--gray-300);
         }
         
         .confirmation-box {
-          background-color: var(--gray-50);
-          border: 1px solid var(--gray-200);
-          border-radius: 0.5rem;
+          background-color: var(--gray-700);
+          border: 1px solid var(--gray-600);
+          border-radius: var(--radius-lg);
           padding: 1.5rem;
           margin: 1.5rem 0;
+          box-shadow: var(--shadow-sm);
+        }
+        
+        .confirmation-box p {
+          color: var(--gray-300);
+          margin-top: 0;
         }
         
         .confirmation-checklist {
           margin-top: 1rem;
           padding-left: 1.5rem;
+          color: var(--gray-300);
         }
         
         .confirmation-checklist li {
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
         }
         
         .form-footer {
           display: flex;
-          justify-content: space-between;
+          flex-direction: column;
+          gap: 1rem;
           margin-top: 2rem;
           padding-top: 1.5rem;
-          border-top: 1px solid var(--gray-200);
+          border-top: 1px solid var(--gray-700);
         }
         
-        .submit-button {
-          min-width: 180px;
+        .form-footer button {
+          width: 100%;
+        }
+        
+        @media (min-width: 480px) {
+          .form-footer {
+            flex-direction: row;
+            justify-content: space-between;
+          }
+          
+          .form-footer button {
+            width: auto;
+          }
+          
+          .submit-button {
+            min-width: 180px;
+          }
         }
       `}</style>
     </div>
