@@ -1,4 +1,5 @@
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import './App.css';
 
 // Form pages
@@ -19,6 +20,17 @@ import ApplicantDetail from '../pages/admin/ApplicantDetail';
 import UserManagement from '../pages/admin/UserManagement';
 import LocationManagement from '../pages/admin/LocationManagement';
 
+// ScrollToTop component to handle scrolling to top on route changes
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <>
@@ -26,6 +38,7 @@ function App() {
       <div className="app-bg"></div>
       
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Navigate to="/form/step1" replace />} />
