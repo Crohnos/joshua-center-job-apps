@@ -73,7 +73,7 @@ function ApplicantDetail() {
             .loading-spinner {
               width: 40px;
               height: 40px;
-              border: 4px solid var(--gray-200);
+              border: 4px solid var(--gray-700);
               border-top: 4px solid var(--primary);
               border-radius: 50%;
               animation: spin 1s linear infinite;
@@ -495,6 +495,27 @@ function ApplicantDetail() {
           
           .form-actions {
             margin-top: var(--space-2);
+          }
+          
+          .status-form select {
+            background-color: var(--gray-800);
+            color: var(--gray-100);
+            border: 1px solid var(--gray-600);
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-3);
+            width: 100%;
+            appearance: revert; /* Override any global appearance settings */
+          }
+          
+          .status-form select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-focus);
+          }
+          
+          .status-form select option {
+            background-color: var(--gray-800);
+            color: var(--gray-100);
           }
           
           /* New layout styles */
