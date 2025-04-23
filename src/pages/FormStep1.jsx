@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
+import FormHeader from '../components/FormHeader';
 import useFormStore from '../store/formStore';
 import { sendVerificationCode, verifyCode, checkEmailExists } from '../services/api';
 
@@ -149,10 +150,7 @@ function FormStep1() {
 
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="app-title">The Joshua Center</h1>
-        <p className="app-subtitle">Job Application Portal</p>
-      </header>
+      <FormHeader />
       
       <Breadcrumbs />
       

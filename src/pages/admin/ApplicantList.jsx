@@ -21,7 +21,13 @@ function ApplicantList() {
     queryFn: getApplicants,
     staleTime: 10000,
     retry: 3,
-    onError: (err) => console.error("Failed to fetch applicants:", err)
+    onError: (err) => console.error("Failed to fetch applicants:", err),
+    onSuccess: (data) => {
+      // Debug: Log the first applicant object structure
+      if (data && data.length > 0) {
+        console.log('Sample applicant object:', data[0]);
+      }
+    }
   });
   
   const { 
@@ -39,7 +45,14 @@ function ApplicantList() {
   // Handle status change
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await updateApplicant(id, { status: newStatus });
+      console.log(`Updating applicant ${id} to status: ${newStatus}`);
+      
+      // Update both status fields to ensure compatibility
+      await updateApplicant(id, { 
+        status: newStatus,
+        application_status: newStatus 
+      });
+      
       refetch(); // Refresh the list
     } catch (error) {
       console.error('Error updating status:', error);
@@ -51,7 +64,8 @@ function ApplicantList() {
   const handleAssignmentChange = async (id, employeeId) => {
     try {
       await updateApplicant(id, { 
-        status: 'in review', 
+        status: 'in review',
+        application_status: 'in review',
         employeeId: employeeId === 'none' ? null : employeeId 
       });
       refetch(); // Refresh the list
@@ -63,7 +77,13 @@ function ApplicantList() {
   
   // Filter applicants based on status, assigned user, and search term
   const filteredApplicants = applicants.filter(app => {
-    const statusMatch = filter === 'all' || app.application_status === filter;
+    // Debug: Log applicant status for debugging
+    console.log(`Applicant ${app.id} status:`, app.application_status || app.status);
+    
+    // Try both status field names
+    const appStatus = app.application_status || app.status;
+    const statusMatch = filter === 'all' || appStatus === filter;
+    
     const userMatch = 
       userFilter === 'all' || 
       (userFilter === 'unassigned' && !app.assigned_employee_id) ||
@@ -83,7 +103,8 @@ function ApplicantList() {
   };
 
   // Format status for display
-  const formatStatus = (status) => {
+  const formatStatus = (applicationStatus, fallbackStatus) => {
+    const status = applicationStatus || fallbackStatus;
     if (!status) return 'Not Viewed';
     return status
       .split(' ')
@@ -189,6 +210,7 @@ function ApplicantList() {
                 <option value="all">All Statuses</option>
                 <option value="not viewed">Not Viewed</option>
                 <option value="in review">In Review</option>
+                <option value="interview scheduled">Interview Scheduled</option>
                 <option value="accepted">Accepted</option>
                 <option value="rejected">Rejected</option>
               </select>
@@ -297,16 +319,17 @@ function ApplicantList() {
                       <td>{app.email}</td>
                       <td>
                         <div className="status-select-wrapper">
-                          <div className={`status-badge status-${app.application_status?.replace(' ', '-') || 'not-viewed'}`}>
-                            {formatStatus(app.application_status)}
+                          <div className={`status-badge status-${(app.application_status || app.status)?.replace(/\s+/g, '-') || 'not-viewed'}`}>
+                            {formatStatus(app.application_status, app.status)}
                           </div>
                           <select 
-                            value={app.application_status || 'not viewed'} 
+                            value={app.application_status || app.status || 'not viewed'} 
                             onChange={(e) => handleStatusChange(app.id, e.target.value)}
                             className="status-select"
                           >
                             <option value="not viewed">Not Viewed</option>
                             <option value="in review">In Review</option>
+                            <option value="interview scheduled">Interview Scheduled</option>
                             <option value="accepted">Accepted</option>
                             <option value="rejected">Rejected</option>
                           </select>

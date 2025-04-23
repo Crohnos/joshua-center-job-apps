@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
+import FormHeader from '../components/FormHeader';
 import useFormStore from '../store/formStore';
 
 // List of US states
@@ -94,10 +95,7 @@ function FormStep2() {
 
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="app-title">The Joshua Center</h1>
-        <p className="app-subtitle">Job Application Portal</p>
-      </header>
+      <FormHeader />
       
       <Breadcrumbs />
       

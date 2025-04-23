@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom';
+import FormHeader from '../components/FormHeader';
 
 function ThankYouPage() {
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="app-title">The Joshua Center</h1>
-        <p className="app-subtitle">Job Application Portal</p>
-      </header>
+      <FormHeader />
       
       <main>
         <div className="card">
@@ -22,7 +20,7 @@ function ThankYouPage() {
               justifyContent: 'center',
               boxShadow: 'var(--shadow-md)'
             }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 6L9 17l-5-5" />
               </svg>
             </div>

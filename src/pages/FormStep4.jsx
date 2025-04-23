@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getLocations } from '../services/api';
 import Breadcrumbs from '../components/Breadcrumbs';
+import FormHeader from '../components/FormHeader';
 import useFormStore from '../store/formStore';
 
 function FormStep4() {
@@ -59,10 +60,7 @@ function FormStep4() {
 
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="app-title">The Joshua Center</h1>
-        <p className="app-subtitle">Job Application Portal</p>
-      </header>
+      <FormHeader />
       
       <Breadcrumbs />
       
@@ -162,6 +160,22 @@ function FormStep4() {
             <div className="form-section">
               <label className="question-label">Which locations are you interested in working at?</label>
               <small className="helper-text">Select all that apply</small>
+              
+              <div className="location-disclaimer">
+                <div className="alert info" style={{ marginBottom: '1.5rem' }}>
+                  <div className="alert-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                  </div>
+                  <div className="alert-content">
+                    <div className="alert-title">Location Availability</div>
+                    <p>If you have flexibility regarding your location, you may select every location you are interested in applying to. However, note that we do NOT have openings available at every location for every semester.</p>
+                  </div>
+                </div>
+              </div>
               <fieldset className="checkbox-fieldset">
                 
                 {isLoading ? (

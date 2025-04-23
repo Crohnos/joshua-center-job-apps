@@ -231,7 +231,7 @@ function updateApplicant(req, res) {
     return res.status(400).send('Status is required');
   }
   
-  const validStatuses = ['not viewed', 'in review', 'rejected', 'accepted'];
+  const validStatuses = ['not viewed', 'in review', 'interview scheduled', 'rejected', 'accepted'];
   if (!validStatuses.includes(status)) {
     return res.status(400).send(`Status must be one of: ${validStatuses.join(', ')}`);
   }

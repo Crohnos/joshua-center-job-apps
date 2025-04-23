@@ -1,6 +1,8 @@
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import './App.css';
+import BrowserNotice from '../components/BrowserNotice';
+import ForestBackground from '../components/ForestBackground';
 
 // Form pages
 import FormStep1 from '../pages/FormStep1';
@@ -32,10 +34,23 @@ function ScrollToTop() {
 }
 
 function App() {
+  // Add logging to check themes and rendering
+  console.log('App: Current theme:', document.documentElement.getAttribute('data-theme'));
+  console.log('App: Is light theme:', document.documentElement.getAttribute('data-theme') === 'light');
+  
+  // Log when the app component renders
+  console.log('App component rendering');
+  
   return (
     <>
       {/* Background pattern */}
       <div className="app-bg"></div>
+      
+      {/* Forest background component that shows only in light mode */}
+      <ForestBackground />
+      
+      {/* Browser compatibility notice */}
+      <BrowserNotice />
       
       <Router>
         <ScrollToTop />

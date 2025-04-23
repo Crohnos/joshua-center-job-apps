@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 function AdminNavbar() {
   const navigate = useNavigate();
@@ -28,6 +29,9 @@ function AdminNavbar() {
             <h2>Joshua Center</h2>
           </div>
           <div className="admin-badge">Admin Portal</div>
+          <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+            <ThemeToggle />
+          </div>
         </div>
         
         <nav className="admin-nav">

@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
+import FormHeader from '../components/FormHeader';
 import useFormStore from '../store/formStore';
 
 function FormStep6() {
@@ -114,9 +115,7 @@ function FormStep6() {
 
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="app-title">Employment History</h1>
-      </header>
+      <FormHeader />
       
       <Breadcrumbs />
       

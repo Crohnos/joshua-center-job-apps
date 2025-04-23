@@ -6,7 +6,7 @@
   text-align: left;
 }
 
-/* App background pattern */
+/* App background pattern - Forest background */
 .app-bg {
   position: fixed;
   top: 0;
@@ -16,11 +16,26 @@
   z-index: -1;
   opacity: 0.08;
   background-image: 
-    linear-gradient(120deg, var(--primary-focus) 0%, transparent 60%),
-    radial-gradient(circle at 25px 25px, var(--gray-200) 2%, transparent 0%),
-    radial-gradient(circle at 75px 75px, var(--gray-200) 2%, transparent 0%);
-  background-size: 100% 100%, 100px 100px, 100px 100px;
+    linear-gradient(120deg, var(--primary-focus) 0%, transparent 70%),
+    radial-gradient(circle at 25px 25px, var(--secondary) 1.5%, transparent 0%),
+    radial-gradient(circle at 75px 75px, var(--primary) 1.5%, transparent 0%),
+    radial-gradient(leaf at 50px 50px, var(--success) 1%, transparent 0%);
+  background-size: 100% 100%, 100px 100px, 100px 100px, 120px 120px;
   pointer-events: none;
+}
+
+/* Forest background for light mode */
+:root[data-theme="light"] .app-bg {
+  opacity: 0.3;
+  background-color: #f9fdfb;
+  background-image: 
+    linear-gradient(0deg, rgba(245, 255, 245, 0.9), rgba(245, 255, 245, 0.8)),
+    repeating-linear-gradient(45deg, 
+      rgba(76, 156, 115, 0.1) 0px, rgba(76, 156, 115, 0.1) 2px,
+      transparent 2px, transparent 4px),
+    repeating-linear-gradient(-45deg, 
+      rgba(138, 154, 91, 0.1) 0px, rgba(138, 154, 91, 0.1) 2px,
+      transparent 2px, transparent 4px);
 }
 
 /* Logo styles */
@@ -686,7 +701,7 @@ tbody tr:hover {
 }
 
 .stat-card {
-  background-color: white;
+  background-color: var(--gray-800);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   padding: var(--space-6);
@@ -696,6 +711,7 @@ tbody tr:hover {
   text-align: center;
   border-top: 4px solid var(--primary);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: var(--gray-100);
 }
 
 .stat-card:nth-child(2) {
@@ -719,7 +735,7 @@ tbody tr:hover {
   font-size: var(--font-size-3xl);
   font-weight: 700;
   margin: var(--space-4) 0;
-  color: var(--gray-900);
+  color: var(--gray-100);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -740,19 +756,21 @@ tbody tr:hover {
 }
 
 .stat-card:nth-child(1) .stat-icon {
-  background-color: rgba(96, 165, 250, 0.2);
+  background-color: var(--primary-focus);
 }
 
 .stat-card:nth-child(2) .stat-icon {
-  background-color: rgba(99, 102, 241, 0.2);
+  background-color: var(--secondary-focus, var(--primary-focus));
 }
 
 .stat-card:nth-child(3) .stat-icon {
-  background-color: rgba(16, 185, 129, 0.2);
+  background-color: var(--primary-focus);
+  opacity: 0.7;
 }
 
 .stat-card:nth-child(4) .stat-icon {
-  background-color: rgba(245, 158, 11, 0.2);
+  background-color: var(--primary-focus);
+  opacity: 0.5;
 }
 
 .stat-icon svg {
@@ -762,24 +780,24 @@ tbody tr:hover {
 }
 
 .stat-card:nth-child(1) .stat-icon svg {
-  color: #3b82f6;
+  color: var(--primary);
 }
 
 .stat-card:nth-child(2) .stat-icon svg {
-  color: #6366f1;
+  color: var(--secondary);
 }
 
 .stat-card:nth-child(3) .stat-icon svg {
-  color: #10b981;
+  color: var(--success);
 }
 
 .stat-card:nth-child(4) .stat-icon svg {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .stat-label {
   font-size: var(--font-size-sm);
-  color: var(--gray-600);
+  color: var(--gray-400);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -1055,18 +1073,27 @@ tbody tr:hover {
 }
 
 .status-in-review {
-  background-color: #eff6ff;
-  color: #1e40af;
+  background-color: var(--gray-800);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.status-interview-scheduled {
+  background-color: var(--gray-800);
+  color: var(--secondary);
+  border-color: var(--secondary);
 }
 
 .status-accepted {
-  background-color: #ecfdf5;
-  color: #065f46;
+  background-color: var(--gray-800);
+  color: var(--success);
+  border-color: var(--success);
 }
 
 .status-rejected {
-  background-color: #fef2f2;
-  color: #b91c1c;
+  background-color: var(--gray-800);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 /* Action Buttons */
@@ -1112,17 +1139,18 @@ tbody tr:hover {
 
 .action-button.view:hover {
   background-color: var(--primary);
-  color: white;
+  color: var(--light);
 }
 
 .action-button.edit:hover {
-  background-color: #eff6ff;
-  color: #1e40af;
+  background-color: var(--primary-focus);
+  color: var(--primary);
 }
 
 .action-button.delete:hover {
-  background-color: #fef2f2;
-  color: #b91c1c;
+  background-color: var(--gray-700);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 /* Screen reader only */
@@ -1390,6 +1418,10 @@ tbody tr:hover {
   color: var(--primary);
 }
 
+.status-interview-scheduled {
+  color: var(--secondary);
+}
+
 .status-accepted {
   color: var(--success);
 }
@@ -1407,72 +1439,152 @@ tbody tr:hover {
       radial-gradient(circle at 25px 25px, var(--gray-700) 2%, transparent 0%),
       radial-gradient(circle at 75px 75px, var(--gray-700) 2%, transparent 0%);
   }
-  
-  .stat-card {
-    background-color: var(--gray-800);
-    border-top: 3px solid var(--primary);
+}
+
+/* Forest pattern for light mode */
+.forest-bg {
+  display: none; /* Hidden by default */
+}
+
+:root[data-theme="light"] .forest-bg {
+  display: block; /* Show only in light mode */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2; /* Below app-bg */
+  background-image: 
+    linear-gradient(0deg, rgba(245, 255, 245, 0.7), rgba(245, 255, 245, 0.6)),
+    url("/images/coniferous-forest-mountains-natural-background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  background-color: var(--gray-700);
+  border: 1px solid var(--gray-600);
+  color: var(--gray-300);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-container {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 999;
+}
+
+/* Fixed position for mobile */
+@media (max-width: 768px) {
+  .theme-toggle-fixed {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+  }
+}
+
+.theme-toggle:hover {
+  background-color: var(--primary-focus);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 768px) {
+  .theme-toggle {
+    top: 20px;
+    bottom: auto;
+  }
+}
+
+/* Browser Notice */
+.browser-notice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--warning);
+  color: var(--dark);
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-md);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.browser-notice-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+}
+
+.browser-notice-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: background-color 0.2s;
+}
+
+.browser-notice-close:hover {
+  background-color: var(--gray-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  .browser-notice {
+    background-color: var(--warning-hover);
+    color: var(--light);
   }
   
-  .stat-label {
-    color: var(--gray-400);
+  .browser-notice-close:hover {
+    background-color: var(--gray-600);
   }
-  
-  thead {
-    background-color: var(--gray-800);
-  }
-  
-  th {
-    color: var(--gray-300);
-    border-bottom: 2px solid var(--gray-700);
-  }
-  
-  td {
-    border-bottom: 1px solid var(--gray-700);
-  }
-  
-  tbody tr {
-    background-color: var(--gray-800);
-  }
-  
-  tbody tr:hover {
-    background-color: var(--gray-700);
-  }
-  
-  .admin-header {
-    background-color: var(--gray-800);
-  }
-  
-  .admin-logo h2 {
-    color: var(--gray-100);
-  }
-  
-  .admin-logo {
-    border-bottom-color: var(--gray-700);
-  }
-  
-  .admin-navbar a, .logout-button {
-    color: var(--gray-400);
-  }
-  
-  .admin-navbar a:hover, .logout-button:hover {
-    background-color: var(--gray-700);
-    color: var(--gray-100);
-  }
-  
-  .admin-navbar li.active a {
-    background-color: rgba(96, 165, 250, 0.15);
-    color: var(--primary);
-  }
-  
-  .logout-button:hover {
-    background-color: rgba(239, 68, 68, 0.15);
-  }
-  
-  .admin-page-title {
-    color: var(--gray-100);
-  }
-  
-  .filter-controls {
-    background-color: var(--gray-800);
-  }
+}
+
+/* Add background forest styling for light theme */
+:root[data-theme="light"] body {
+  background-color: #f1f6f2;
+}
+
+/* Card styling for light mode with forest theme */
+:root[data-theme="light"] .card {
+  background-color: rgba(241, 246, 242, 0.85);
+  border: 1px solid var(--primary);
+  border-top: 3px solid var(--primary);
+  box-shadow: 0 10px 25px -5px rgba(76, 156, 115, 0.15), 0 5px 10px -5px rgba(76, 156, 115, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }

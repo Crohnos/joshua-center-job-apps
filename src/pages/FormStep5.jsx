@@ -1,6 +1,7 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
+import FormHeader from '../components/FormHeader';
 import useFormStore from '../store/formStore';
 
 function FormStep5() {
@@ -86,9 +87,7 @@ function FormStep5() {
 
   return (
     <div className="container">
-      <header className="app-header">
-        <h1 className="app-title">Education & Credentials</h1>
-      </header>
+      <FormHeader />
       
       <Breadcrumbs />
       
